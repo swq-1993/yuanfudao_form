@@ -169,6 +169,73 @@ public:
         }
     }
 
+    //用IOU的思想对 行 进行聚类
+    void cluster_row(vector<Bounding_box>& bounding_boxs, vector<vector<Bounding_box>>& clusters_row)
+    {
+        vector<Bounding_box> copy = bounding_boxs;
+        vector<Bounding_box> tmp;
+        for (int i = 0; i < copy.size(); i++)
+        {
+            int tmp_top = copy[i].y;
+            int tmp_bottom = copy[i].y + copy[i].height;
+            tmp.push_back(copy[i]);
+            for (int j = 0; j < copy.size(); j++)
+            {
+                if (i == j){
+                    continue;
+                }
+                int Iou_min = max(tmp_top, copy[j].y);
+                int Iou_max = min(tmp_bottom, copy[j].y + copy[j].height);
+                if (Iou_max >= Iou_min)
+                {
+                    tmp.push_back(copy[j]);
+                    tmp_top = min(tmp_top, copy[j].y);
+                    tmp_bottom = max(tmp_bottom, copy[j].y + copy[j].height);
+
+                    copy.erase(copy.begin() + j);
+                    j = i;
+                }
+            }
+            clusters_row.push_back(tmp);
+            tmp.clear();
+        }
+        sort(clusters_row.begin(), clusters_row.end(), comp_row);
+    }
+
+
+    //用IOU的思想对 列 进行聚类
+    void cluster_col(vector<Bounding_box>& bounding_boxs, vector<vector<Bounding_box>>& clusters_col)
+    {
+        vector<Bounding_box> copy = bounding_boxs;
+        vector<Bounding_box> tmp;
+        for (int i = 0; i < copy.size(); i++)
+        {
+            int tmp_left = copy[i].x;
+            int tmp_right = copy[i].x + copy[i].width;
+            tmp.push_back(copy[i]);
+            for (int j = 0; j < copy.size(); j++)
+            {
+                if (i == j){
+                    continue;
+                }
+                int Iou_min = max(tmp_left, copy[j].x);
+                int Iou_max = min(tmp_right, copy[j].x + copy[j].width);
+                if (Iou_max >= Iou_min)
+                {
+                    tmp.push_back(copy[j]);
+                    tmp_left = min(tmp_left, copy[j].x);
+                    tmp_right = max(tmp_right, copy[j].x + copy[j].width);
+
+                    copy.erase(copy.begin() + j);
+                    j = i;
+                }
+            }
+            clusters_col.push_back(tmp);
+            tmp.clear();
+        }
+        sort(clusters_col.begin(), clusters_col.end(), comp_col);
+    }
+
     //计算簇内的平方误差
     float getVar(vector<vector<Bounding_box>>& clusters, vector<Cluster_center>& centers, const int cur_k, bool row_or_col) {
         float var = 0;
@@ -409,6 +476,15 @@ public:
             return false;
     }
 
+    static bool compare_col(const Bounding_box a, const Bounding_box b){
+        if (a.x < b.x)
+            return true;
+        else if (a.x == b.x)
+            return a.y < b.y;
+        else
+            return false;
+    }
+
     //行结果的排序规则
     static bool comp_row(const vector<Bounding_box>& a, const vector<Bounding_box>& b) {
         return a[0].y < b[0].y;
@@ -422,6 +498,10 @@ public:
     //对一个格子里面的box按从左到右排序
     static bool comp_col_single(const Bounding_box a, const Bounding_box b) {
         return a.x < b.x;
+    }
+
+    static bool comp_row_single(const Bounding_box a, const Bounding_box b) {
+        return a.y < b.y;
     }
 
     //将拆分下来的字符串，按照内容，封装到一个bounding box结构体对象里面
@@ -494,13 +574,17 @@ int main() {
     clock_t start, end;
     start = clock();
 
-    int best_k_row = formOperator.find_best_k(formOperator.bounding_boxs, k_row_min, k_row_max, formOperator.clusters_row, formOperator.centers_row,
-                                          false);
-    int best_k_col = formOperator.find_best_k(formOperator.bounding_boxs, k_col_min, k_col_max, formOperator.clusters_col, formOperator.centers_col,
-                                          true);
+//    int best_k_row = formOperator.find_best_k(formOperator.bounding_boxs, k_row_min, k_row_max, formOperator.clusters_row, formOperator.centers_row,
+//                                          false);
+//    int best_k_col = formOperator.find_best_k(formOperator.bounding_boxs, k_col_min, k_col_max, formOperator.clusters_col, formOperator.centers_col,
+//                                          true);
+
+        formOperator.cluster_row(formOperator.bounding_boxs, formOperator.clusters_row);
+        formOperator.cluster_col(formOperator.bounding_boxs, formOperator.clusters_col);
 
     end = clock();
     cout << "耗时: " << (double)(end - start) / CLOCKS_PER_SEC << endl;
+    /*
     cout << endl << "Best K: " << best_k_col << endl;
     for (int label = 0; label < best_k_col; label++) {
         cout << "第" << label + 1 << "个簇" << endl;
@@ -553,6 +637,7 @@ int main() {
 //        cout << endl;
 //    }
 
+     */
     formOperator.group_clusters_res(formOperator.group_res, formOperator.clusters_row, formOperator.clusters_col);
     cout << "解析结果：" << endl;
     for (int i = 0; i < formOperator.group_res.size(); i++)
@@ -587,7 +672,10 @@ int main() {
         }
         cout << endl;
     }
+
+
     return 0;
+
 }
 
 
