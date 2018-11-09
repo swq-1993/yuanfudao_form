@@ -638,7 +638,10 @@ int main() {
 //    }
 
      */
+    start = clock();
     formOperator.group_clusters_res(formOperator.group_res, formOperator.clusters_row, formOperator.clusters_col);
+    end = clock();
+    cout << "解析耗时： " << (double)(end - start) / CLOCKS_PER_SEC << endl;
     cout << "解析结果：" << endl;
     for (int i = 0; i < formOperator.group_res.size(); i++)
     {
@@ -656,7 +659,10 @@ int main() {
     }
     cout << endl;
 
+    start = clock();
     formOperator.splice_chi_char(formOperator.group_res);
+    end = clock();
+    cout << "合并印刷体汉字耗时： " << (double)(end - start) / CLOCKS_PER_SEC << endl;
     cout << endl << "合并印刷体汉字结果：" << endl;
     for (int i = 0; i < formOperator.group_res.size(); i++)
     {
