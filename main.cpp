@@ -4,8 +4,17 @@
 int main() {
 
     FormOperator formOperator;
-    formOperator.ReadDataFromTxt("../test2.txt");
+    formOperator.ReadDataFromTxt("../box_info/166f6b30449f371.txt");
+//    formOperator.ReadDataFromTxt("../test.txt");
+
+    if (formOperator.file_content.empty()){
+        cout << "未从识别文档中解析出结果；" << endl;
+        exit(1);
+    }
     formOperator.analysis(formOperator.file_content, formOperator.bboxs, formOperator.big_bboxs);
+    cout << formOperator.bboxs.size() << endl;
+    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[0]);
+    cout << "after filter: " << formOperator.bboxs.size() << endl;
     clock_t start, end;
     start = clock();
 
@@ -14,8 +23,25 @@ int main() {
 //    int best_k_col = formOperator.find_best_k(formOperator.bounding_boxs, k_col_min, k_col_max, formOperator.clusters_col, formOperator.centers_col,
 //                                          true);
 
+
         formOperator.cluster_row(formOperator.bboxs, formOperator.clusters_row);
+        /*cout << "行内容： " << endl;
+        for (int i = 0; i < formOperator.clusters_row.size(); i++){
+            for (int j = 0; j < formOperator.clusters_row[i].size(); j++){
+                cout << formOperator.clusters_row[i][j].text << " ";
+            }
+            cout << endl;
+        }
+        cout << endl;*/
         formOperator.cluster_col(formOperator.bboxs, formOperator.clusters_col);
+        /*cout << "列内容：" << endl;
+        for (int i = 0; i < formOperator.clusters_col.size(); i++){
+            for (int j = 0; j < formOperator.clusters_col[i].size(); j++){
+                cout << formOperator.clusters_col[i][j].text << " ";
+            }
+            cout << endl;
+        }
+        cout << endl;*/
 
     end = clock();
     cout << "耗时: " << (double)(end - start) / CLOCKS_PER_SEC << endl;

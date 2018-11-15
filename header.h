@@ -24,10 +24,6 @@ using namespace std;
 #define k_col_min 3
 #define k_col_max 15
 
-//题干素材
-
-
-
 
 // 单个检测框
 struct Bbox{
@@ -36,7 +32,7 @@ struct Bbox{
     int width;
     int height;
     int class_idx;
-    string text = "";
+    string text = "空";
 };
 
 // 行、列检测框
@@ -49,7 +45,7 @@ struct Row_box{
     vector<Bbox> single_boxs;
 };
 
-//大框和序号的检测框 203和102
+//大框和序号的检测框 200、201、202、203、102
 struct Big_bbox{
     int x;
     int y;
@@ -85,8 +81,11 @@ public:
     map< pair<pair <string,string>, string>, int > stem_map;
     vector<string> rule{"加法", "减法", "乘法", "除法"};
 
+    //题干，之后可以在此扩充
     vector<vector<string>> stem{
 
+            {"单价", "数量", "金额", "2"},
+            {"数量", "单价", "金额", "2"},
             {"单价", "数量", "总价", "2"},
             {"数量", "单价", "总价", "2"},
             {"速度", "时间", "路程", "2"},
@@ -95,13 +94,17 @@ public:
             {"因数", "因数", "积", "2"},
             {"被除数", "除数", "商", "3"},
             {"加数", "加数", "和", "0"},
-            {"被减数", "减数", "差", "1"}
+            {"被减数", "减数", "差", "1"},
+            {"单产量", "数量", "总价", "2"}
 
     };
+    //将要运算的数字运算验证
+    void compute(vector<vector<string>>& nums, int rule);
 
-
+    //根据拿下来的res，进行匹配运算规则
     int match_formula(map< pair<pair <string,string>, string>, int >& stem_map, vector<vector<vector<Bbox>>>& group_res);
 
+    //将所给的题型初始化到指定数据结构
     void init(map< pair<pair <string,string>, string>, int >& stem_map);
 
     //用k-means实现聚类，来观察有几行几列
@@ -125,6 +128,9 @@ public:
 
     //用IOU的思想对 行 进行聚类
     void cluster_row(vector<Bbox>& bboxs, vector<vector<Bbox>>& clusters_row);
+
+    //根据 行聚类结果对 列 进行聚类
+    void cluster_col2(vector<vector<Bbox>>& clusters_row, vector<vector<vector<Bbox>>> group_res);
 
     //用IOU的思想对 列 进行聚类
     void cluster_col(vector<Bbox>& bboxs, vector<vector<Bbox>>& clusters_col);
@@ -167,6 +173,9 @@ public:
 
     //将拆分下来的字符串，按照内容，封装到一个bounding box结构体对象里面
     void analysis(vector<string>& file_content, vector<Bbox>& bboxs, vector<Big_bbox>& big_bboxs);
+
+    //过滤掉大框外面的小框
+    void filter(vector<Bbox>& bboxs, Big_bbox big_bbox);
 
     //实现字符串的split函数
     vector<string> split_line(string single_line, char symbol);

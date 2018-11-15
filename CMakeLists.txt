@@ -3,4 +3,5 @@ project(form)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(form main.cpp)
+add_executable(form main.cpp header.h formOperator.cpp)
+add_executable(intersection intersection.cpp)

@@ -3,6 +3,34 @@
 //
 #include "header.h"
 
+//将要运算的数字运算验证
+void FormOperator::compute(vector<vector<string>> &nums, int rule){
+
+}
+
+bool string_blurry_match(string a, string b){
+    if (a.length() == b.length()){
+        return a == b;
+    }
+    else if (a.length() < b.length()){
+        for (int i = 0; i < a.length(); i++){
+            if (a[i] != b[i]){
+                return false;
+            }
+        }
+        return true;
+    }
+    else{
+        for (int i = 0; i < b.length(); i++){
+            if (a[i] != b[i]){
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+//根据拿下来的res，进行匹配运算规则
 int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& stem_map, vector<vector<vector<Bbox>>>& group_res)
 {
     int res = -1;
@@ -10,18 +38,19 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
     int row = -1;
     int col = -1;
     map< pair<pair <string,string>, string>, int > :: iterator iter;
+    vector<int> rows;
+    vector<int> cols;
     for (int i = 0; i < group_res.size(); i++) {
         for (int j = 0; j < group_res[i].size(); j++) {
-            if (group_res[i][j].size() == 0){
+            if (group_res[i][j].size() == 0 || group_res[i][j][0].class_idx != 100){
                 continue;
             }
             iter = stem_map.begin();
             while (iter != stem_map.end()){
-
-                if (group_res[i][j][0].text == iter->first.first.first){
-                    find = true;
+                if (string_blurry_match(group_res[i][j][0].text, iter->first.first.first)){
                     row = i;
                     col = j;
+                    find = true;
                     break;
                 }
                 iter++;
@@ -36,25 +65,150 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
         }
     }
 
+    vector<vector<string>> nums;
     if (find){
-        //题干在一列，且保证之后还有两行
-        if (group_res.size() > (row + 1) && iter->first.first.second == group_res[row + 1][col][0].text){
-            if (group_res.size() > (row + 2) && iter->first.second == group_res[row + 2][col][0].text){
-                res = iter->second;
+        //题干在一列，且保证之后还有两行，找到剩下两行的位置
+//        if (group_res.size() > (row + 1) && iter->first.first.second == group_res[row + 1][col][0].text){
+//            if (group_res.size() > (row + 2) && iter->first.second == group_res[row + 2][col][0].text){
+
+//        vector<int> rows{row};
+        rows.push_back(row);
+        if (group_res.size() > (row + 2)){
+            for (int i = row + 1; i < group_res.size() - 1; i++)
+            {
+                if (!group_res[i][col].empty() && string_blurry_match(group_res[i][col][0].text, iter->first.first.second)){
+                    rows.push_back(i);
+                    for (int j = i + 1; j < group_res.size(); j++){
+                        if (!group_res[j][col].empty() && string_blurry_match(group_res[j][col][0].text, iter->first.second)){
+                            rows.push_back(j);
+                            break;
+                        }
+                    }
+                }
+                if (rows.size() == 3){
+                    res = iter->second;
+                    break;
+                }
+            }
+
+            if (rows.size() == 3){
+                vector<string> tmp;
+                for (int i = col + 1; i < group_res[0].size(); i++){
+                    tmp.clear();
+                    for (int j = 0; j < 3; j++){
+                        if (!group_res[rows[j]][i].empty() && (group_res[rows[j]][i][0].class_idx == 104 || group_res[rows[j]][i][0].class_idx == 101)){
+//                            cout << "题目坐标： "<< rows[j] << " " << i << endl;
+                            if (group_res[rows[j]][i][0].text.empty()){
+                                tmp.push_back("空");
+                            }
+                            else{
+                                tmp.push_back(group_res[rows[j]][i][0].text);
+                            }
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    if (tmp.size() == 3){
+                        nums.push_back(tmp);
+                    }
+                }
             }
         }
 
-        //题干在一行，且保证之后还有两列
-        else if (group_res[0].size() > (col + 1) && iter->first.first.second == group_res[row][col + 1][0].text){
-            if (group_res[0].size() > (col + 2) && iter->first.second == group_res[row][col + 1][0].text){
+        if (rows.empty() && group_res[0].size() > (col + 2)){
+//            vector<int> cols{col};
+            cols.push_back(col);
+            for (int i = col + 1; i < group_res[0].size() - 1; i++){
+                if (!group_res[row][i].empty() && string_blurry_match(group_res[row][i][0].text, iter->first.first.second)){
+                    cols.push_back(i);
+                    for (int j = i + 1; j < group_res[0].size(); j++){
+                        if (!group_res[row][j].empty() && string_blurry_match(group_res[row][j][0].text, iter->first.second)){
+                            cols.push_back(j);
+                            break;
+                        }
+                    }
+                }
+                if (cols.size() == 3){
+                    res = iter->second;
+                    break;
+                }
+            }
+
+            if (cols.size() == 3){
+
+                vector<string> tmp;
+                for (int i = row + 1; i < group_res.size(); i++){
+                    tmp.clear();
+                    for (int j = 0; j < 3; j++){
+                        if (!group_res[i][cols[j]].empty() && (group_res[i][cols[j]][0].class_idx == 104 || group_res[i][cols[j]][0].class_idx == 101)){
+//                            cout << "题目坐标： "<< i << " " << cols[j] << endl;
+                            if (group_res[i][cols[j]][0].text.empty()){
+                                tmp.push_back("空");
+                            }
+                            else{
+                                tmp.push_back(group_res[i][cols[j]][0].text);
+                            }
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    if (tmp.size() == 3){
+                        nums.push_back(tmp);
+                    }
+                }
+            }
+        }
+
+        /*if (group_res.size() > (row + 1) && string_blurry_match(iter->first.first.second, group_res[row + 1][col][0].text)){
+            if (group_res.size() > (row + 2) && string_blurry_match(iter->first.second, group_res[row + 2][col][0].text)){
+                vector<vector<string>> nums;
+                vector<string> tmp;
+                for (int i = col + 1; i < group_res[0].size(); i++){
+                    tmp.clear();
+                    if (group_res[row][i][0].class_idx == 104){
+                        for (int j = row; j < row + 3; j++){
+                            tmp.push_back(group_res[j][i][0].text);
+                        }
+                        nums.push_back(tmp);
+                    }
+                }
                 res = iter->second;
             }
+        }*/
+
+        //题干在一行，且保证之后还有两列，找到剩下两列的位置
+        /*else if (group_res[0].size() > (col + 1) && iter->first.first.second == group_res[row][col + 1][0].text){
+            if (group_res[0].size() > (col + 2) && iter->first.second == group_res[row][col + 1][0].text){
+                vector<vector<string>> nums;
+                vector<string> tmp;
+                for (int i = row + 1; i < group_res.size(); i++){
+                    tmp.clear();
+                    if (group_res[i][col][0].class_idx == 104){
+                        for (int j = col; j < col + 3; j++){
+                            tmp.push_back(group_res[i][j][0].text);
+                        }
+                        nums.push_back(tmp);
+                    }
+                }
+
+                res = iter->second;
+            }
+        }*/
+    }
+    if (res != -1){
+        for (int i = 0; i < nums.size(); i++){
+            for (int j = 0; j < nums[i].size(); j++){
+                cout << nums[i][j] << " ";
+            }
+            cout << endl;
         }
     }
     return res;
 }
 
-
+//将所给的题型初始化到指定数据结构
 void FormOperator::init(map< pair<pair <string,string>, string>, int >& stem_map) {
 //    map< pair<pair <string,string>, string>, int > mymap ;// declare map of pairs
 //    mymap[ make_pair(make_pair("单价","数量"), "总价") ] = 2 ; // map[key] =value
@@ -96,17 +250,20 @@ double FormOperator::dist(const Cluster_center a, const Bbox b) {
 vector<Bbox> FormOperator::intersection(vector<Bbox>& A, vector<Bbox>& B)
 {
     vector<Bbox> res;
-    unordered_map<int, Bbox>part_a, part_b;
+    map<pair<int, int>, Bbox>part_a, part_b;
     for(auto a : A) {
-        part_a.insert(make_pair(a.x, a));
+        part_a.insert(make_pair(make_pair(a.x, a.y), a));
     }
     for (auto b : B) {
-        part_b.insert(make_pair(b.x, b));
+        part_b.insert(make_pair(make_pair(b.x, b.y), b));
     }
 
-    unordered_map<int, Bbox> :: iterator iter = part_a.begin();
+    map<pair<int, int>, Bbox> :: iterator iter = part_a.begin();
     while (iter != part_a.end()) {
-        if (part_b.find(iter->first) != part_b.end()) {
+        /*if (part_b.find(iter->first) != part_b.end()) {
+            res.push_back(iter->second);
+        }*/
+        if (part_b.find(make_pair(iter->first.first, iter->first.second)) != part_b.end()){
             res.push_back(iter->second);
         }
         iter++;
@@ -128,6 +285,11 @@ void FormOperator::group_clusters_res(vector<vector<vector<Bbox>>>& group_res, v
 //                set_intersection(clusters_row[i].begin(), clusters_row[i].end(), clusters_col[j].begin(), clusters_col[j].end(), back_inserter(tmp));
             tmp = intersection(clusters_row[i], clusters_col[j]);
             sort(tmp.begin(), tmp.end(), comp_col_single);
+           /* cout << "合并结果： " << i << " " << j << endl;
+            for (int index = 0; index < tmp.size(); index++){
+                cout << tmp[index].text << " ";
+            }
+            cout << endl;*/
             tmp_row.push_back(tmp);
             tmp.clear();
         }
@@ -181,15 +343,21 @@ void FormOperator::splice_chi_char(vector<vector<vector<Bbox>>>& group_res)
 void FormOperator::cluster_row(vector<Bbox>& bboxs, vector<vector<Bbox>>& clusters_row)
 {
     vector<Bbox> copy = bboxs;
+    sort(bboxs.begin(), bboxs.end(), compare);
+    vector<bool> flag(copy.size(), true);
     vector<Bbox> tmp;
     for (int i = 0; i < copy.size(); i++)
     {
+        if (!flag[i]){
+            continue;
+        }
         int tmp_top = copy[i].y;
         int tmp_bottom = copy[i].y + copy[i].height;
         tmp.push_back(copy[i]);
+        flag[i] = false;
         for (int j = 0; j < copy.size(); j++)
         {
-            if (i == j){
+            if (!flag[j]){
                 continue;
             }
             int Iou_min = max(tmp_top, copy[j].y);
@@ -199,8 +367,8 @@ void FormOperator::cluster_row(vector<Bbox>& bboxs, vector<vector<Bbox>>& cluste
             cout << (double)(Iou_max - Iou_min);
             cout << " " << (double)(0.5 * copy[j].height) << endl;*/
 //            if (Iou_max >= Iou_min)
-            if ((double)(Iou_max - Iou_min) >= (double)(0.5 * copy[j].height) &&
-                copy[j].y < (tmp_top + tmp_bottom) / 2)
+            if ((double)(Iou_max - Iou_min) >= (double)(0.25 * copy[j].height) &&
+                copy[j].y < tmp_top + (tmp_bottom - tmp_top) * 0.75)
             {
 
 //                cout << "合并" << endl;
@@ -208,47 +376,96 @@ void FormOperator::cluster_row(vector<Bbox>& bboxs, vector<vector<Bbox>>& cluste
                 tmp_top = min(tmp_top, copy[j].y);
                 tmp_bottom = max(tmp_bottom, copy[j].y + copy[j].height);
 
-                copy.erase(copy.begin() + j);
-                j = i;
+//                copy.erase(copy.begin() + j);
+                flag[j] = false;
             }
         }
-//        copy.erase(copy.begin() + i);
+        sort(tmp.begin(), tmp.end(), [](const Bbox &a, const Bbox &b){return a.x < b.x;});
         clusters_row.push_back(tmp);
         tmp.clear();
     }
     sort(clusters_row.begin(), clusters_row.end(), comp_row);
 }
 
+void FormOperator::cluster_col2(vector<vector<Bbox>>& clusters_row, vector<vector<vector<Bbox>>> group_res){
+
+    vector<Bbox> tmp;
+    vector<vector<bool>> flag;
+    for (int i = 0; i < clusters_row.size(); i++){
+        for (int j = 0; j < clusters_row[i].size(); j++){
+            for (int m = j + 1; m < clusters_row[i].size(); m++){
+
+                //合并相邻
+                if ((clusters_row[i][m].x - clusters_row[i][j].x) < clusters_row[i][m].width &&
+                    clusters_row[i][m].class_idx == 100 &&
+                        clusters_row[i][j].class_idx == 100){
+
+                }
+            }
+        }
+    }
+
+}
 
 //用IOU的思想对 列 进行聚类
 void FormOperator::cluster_col(vector<Bbox>& bboxs, vector<vector<Bbox>>& clusters_col)
 {
     vector<Bbox> copy = bboxs;
+    sort(copy.begin(), copy.end(), compare_col);
+    vector<bool> flag(copy.size(), true);
     vector<Bbox> tmp;
     for (int i = 0; i < copy.size(); i++)
     {
+        if (!flag[i]){
+            continue;
+        }
         int tmp_left = copy[i].x;
         int tmp_right = copy[i].x + copy[i].width;
         tmp.push_back(copy[i]);
+        flag[i] = false;
         for (int j = 0; j < copy.size(); j++)
         {
-            if (i == j){
+            if (!flag[j]){
                 continue;
             }
             int Iou_min = max(tmp_left, copy[j].x);
             int Iou_max = min(tmp_right, copy[j].x + copy[j].width);
-            if (Iou_max >= Iou_min)
-//            if ((double)(Iou_max - Iou_min) >= (double)(0.75 * copy[j].width) &&
-//                    copy[j].x <= (tmp_left + tmp_right) / 2)
-            {
+
+           /* cout << "compare: " << copy[i].y << " " << copy[i].text << " " << copy[j].y << " " << copy[j].text << endl;
+            cout << tmp_left << " " << tmp_right << endl;
+            cout << (double)(Iou_max - Iou_min);
+//            cout << " " << (double)(0.5 * copy[j].height) << endl;*/
+            if (Iou_max >= Iou_min && copy[j].class_idx == 100){
                 tmp.push_back(copy[j]);
                 tmp_left = min(tmp_left, copy[j].x);
                 tmp_right = max(tmp_right, copy[j].x + copy[j].width);
 
-                copy.erase(copy.begin() + j);
-                j = i;
+                flag[j] = false;
             }
+            else if ((double)(Iou_max - Iou_min) >= (double)(0.25 * copy[j].width) &&
+                    copy[j].x <= tmp_left + (tmp_right - tmp_left) * 0.75){
+                tmp.push_back(copy[j]);
+                tmp_left = min(tmp_left, copy[j].x);
+                tmp_right = max(tmp_right, copy[j].x + copy[j].width);
+
+                flag[j] = false;
+            }
+//            if ((double)(Iou_max - Iou_min) >= (double)(0.5 * copy[j].width) &&
+//                    copy[j].x <= tmp_left + (tmp_right - tmp_left) * 0.5)
+        /*if ((double)(Iou_max - Iou_min) >= (double)(0.5 * copy[j].width))
+            {
+                if ((tmp_left <= copy[j].x && copy[j].x <= (tmp_left + tmp_right) * 0.5) ||
+                        (tmp_left > copy[j].x && copy[j].x + copy[j].width <= (tmp_left + tmp_right) * 0.5)){
+                    tmp.push_back(copy[j]);
+                    tmp_left = min(tmp_left, copy[j].x);
+                    tmp_right = max(tmp_right, copy[j].x + copy[j].width);
+
+                    copy.erase(copy.begin() + j);
+                    j = i;
+                }
+            }*/
         }
+        sort(tmp.begin(), tmp.end(), [](const Bbox &a, const Bbox &b){return a.y < b.y;});
         clusters_col.push_back(tmp);
         tmp.clear();
     }
@@ -488,7 +705,7 @@ void FormOperator::group_col(vector<vector<Bbox>>& clusters, vector<Cluster_cent
 //按照上和左的位置进行排序
 bool FormOperator::compare(const Bbox a, const Bbox b) {
     if (a.y < b.y)
-        return true;
+        return a.x < b.x;
     else if (a.y == b.y)
         return a.x < b.x;
     else
@@ -524,34 +741,81 @@ bool FormOperator::comp_row_single(const Bbox a, const Bbox b) {
 }
 
 //将拆分下来的字符串，按照内容，封装到一个bounding box结构体对象里面
-void FormOperator::analysis(vector<string>& file_content, vector<Bbox>& bboxs, vector<Big_bbox>& big_bounding_boxs) {
+void FormOperator::analysis(vector<string>& file_content, vector<Bbox>& bboxs, vector<Big_bbox>& big_bboxs) {
     for (int i = 0; i < file_content.size(); i++) {
         Bbox bbox;
         Big_bbox big_bbox;
-
         vector<string> splitedLine = split_line(file_content[i], ' ');
-        string class_id = split_line(splitedLine[4], ':')[1];
-        if (class_id == "102" || class_id == "203" || class_id == "200" || class_id == "201" || class_id == "202") {
-            big_bbox.x = stoi(split_line(splitedLine[0], ':')[1]);
-            big_bbox.y = stoi(split_line(splitedLine[1], ':')[1]);
-            big_bbox.width = stoi(split_line(splitedLine[2], ':')[1]);
-            big_bbox.height = stoi(split_line(splitedLine[3], ':')[1]);
-            big_bbox.class_idx = stoi(split_line(splitedLine[4], ':')[1]);
-            big_bboxs.push_back(big_bbox);
-        }
-        else{
-            bbox.x = stoi(split_line(splitedLine[0], ':')[1]);
-            bbox.y = stoi(split_line(splitedLine[1], ':')[1]);
-            bbox.width = stoi(split_line(splitedLine[2], ':')[1]);
-            bbox.height = stoi(split_line(splitedLine[3], ':')[1]);
-            bbox.class_idx = stoi(split_line(splitedLine[4], ':')[1]);
-            if (splitedLine.size() == 6) {
-                bbox.text = split_line(splitedLine[5], ':')[1];
+        if (splitedLine.size() >= 5){
+            string class_id = split_line(splitedLine[4], ':')[1];
+            if (class_id == "203" || class_id == "200" || class_id == "201" || class_id == "202") {
+                big_bbox.x = stoi(split_line(splitedLine[0], ':')[1]);
+                big_bbox.y = stoi(split_line(splitedLine[1], ':')[1]);
+                big_bbox.width = stoi(split_line(splitedLine[2], ':')[1]);
+                big_bbox.height = stoi(split_line(splitedLine[3], ':')[1]);
+                big_bbox.class_idx = stoi(split_line(splitedLine[4], ':')[1]);
+                big_bboxs.push_back(big_bbox);
             }
-            bboxs.push_back(bbox);
+            else if(class_id == "100" || class_id == "101" || class_id == "103" || class_id == "104"){
+                bbox.x = stoi(split_line(splitedLine[0], ':')[1]);
+                bbox.y = stoi(split_line(splitedLine[1], ':')[1]);
+                bbox.width = stoi(split_line(splitedLine[2], ':')[1]);
+                bbox.height = stoi(split_line(splitedLine[3], ':')[1]);
+                bbox.class_idx = stoi(split_line(splitedLine[4], ':')[1]);
+                if (splitedLine.size() == 6) {
+                    bbox.text = split_line(splitedLine[5], ':')[1];
+                }
+                bboxs.push_back(bbox);
+            }
+
+            /*if (class_id == "100" || class_id == "101" || class_id == "103" || class_id == "104") {
+                bbox.x = stoi(split_line(splitedLine[0], ':')[1]);
+                bbox.y = stoi(split_line(splitedLine[1], ':')[1]);
+                bbox.width = stoi(split_line(splitedLine[2], ':')[1]);
+                bbox.height = stoi(split_line(splitedLine[3], ':')[1]);
+                bbox.class_idx = stoi(split_line(splitedLine[4], ':')[1]);
+                if (splitedLine.size() == 6) {
+                    bbox.text = split_line(splitedLine[5], ':')[1];
+                }
+                bboxs.push_back(bbox);
+            }
+            else{
+                big_bbox.x = stoi(split_line(splitedLine[0], ':')[1]);
+                big_bbox.y = stoi(split_line(splitedLine[1], ':')[1]);
+                big_bbox.width = stoi(split_line(splitedLine[2], ':')[1]);
+                big_bbox.height = stoi(split_line(splitedLine[3], ':')[1]);
+                big_bbox.class_idx = stoi(split_line(splitedLine[4], ':')[1]);
+                big_bboxs.push_back(big_bbox);
+            }*/
         }
+
     }
     sort(bboxs.begin(), bboxs.end(), compare);
+    sort(big_bboxs.begin(), big_bboxs.end(), [](const Big_bbox &a, const Big_bbox &b){return a.y < b.y;});
+}
+
+//过滤掉大框外面的小框
+void FormOperator::filter(vector<Bbox>& bboxs, Big_bbox big_bbox){
+    vector<Bbox> tmp;
+    for (int i = 0; i < bboxs.size(); i++){
+        int Iou_min_row = max(bboxs[i].x, big_bbox.x);
+        int Iou_max_row = min(bboxs[i].x + bboxs[i].width, big_bbox.x + big_bbox.width);
+
+        int Iou_min_col = max(bboxs[i].y, big_bbox.y);
+        int Iou_max_col = min(bboxs[i].y + bboxs[i].height, big_bbox.y + big_bbox.height);
+
+//        if (Iou_max_row >= Iou_min_row && Iou_max_col >= Iou_min_col){
+        //增加过滤条件
+        if ((Iou_max_row - Iou_min_row >= bboxs[i].width * 0.75) && (Iou_max_col - Iou_min_col >= bboxs[i].height * 0.75)){
+            tmp.push_back(bboxs[i]);
+        }
+    }
+    bboxs.clear();
+    bboxs = tmp;
+//    sort(erase_index.begin(), erase_index.end(), greater<int>());
+//    for (int i = 0; i < erase_index.size(); i++){
+//        bboxs.erase(bboxs.begin() + i);
+//    }
 }
 
 //实现字符串的split函数

@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/sunwanqi/CLionProjects/form/formOperator.cpp
+header.h
+/Users/sunwanqi/CLionProjects/form/header.h
+
+/Users/sunwanqi/CLionProjects/form/header.h
+iostream
+-
+string
+-
+vector
+-
+fstream
+-
+algorithm
+-
+math.h
+-
+cmath
+-
+unordered_map
+-
+map
+-
+
+/Users/sunwanqi/CLionProjects/form/main.cpp
+time.h
+-
+header.h
+/Users/sunwanqi/CLionProjects/form/header.h
+
