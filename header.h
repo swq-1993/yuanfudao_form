@@ -67,6 +67,7 @@ private:
 
 public:
     int formula = -1;
+    const int chi_length = 4 * 3;
     vector<string> file_content;
     vector<Bbox> bboxs;
     vector<Big_bbox> big_bboxs;
@@ -98,6 +99,13 @@ public:
             {"单产量", "数量", "总价", "2"}
 
     };
+
+    //判断第一行是否存在很长的中文字符串，这种长的中文字符串是不会出现在表格里面的，所以判定为表格外的干扰
+    bool exist_long_chi(vector<vector<vector<Bbox>>>& group_res);
+
+    //去掉第一行的干扰信息
+    void filter_long_chi_str(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col);
+
     //将要运算的数字运算验证
     void compute(vector<vector<string>>& nums, int rule);
 

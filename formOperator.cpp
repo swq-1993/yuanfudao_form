@@ -3,6 +3,47 @@
 //
 #include "header.h"
 
+
+//判断第一行是否存在很长的中文字符串，这种长的中文字符串是不会出现在表格里面的，所以判定为表格外的干扰
+bool FormOperator::exist_long_chi(vector<vector<vector<Bbox>>>& group_res){
+    bool res = false;
+    if (group_res.empty()){
+        return false;
+    }
+    for (int i = 0; i < group_res[0].size(); i++){
+        if (!group_res[0].empty()){
+            for (int j = 0; j < group_res[0][i].size(); j++){
+                if (group_res[0][i][j].text.length() >= chi_length && group_res[0][i][j].class_idx == 100)
+                {
+                    cout << "判断要删除的字符串:" << group_res[0][i][j].text << " length:" << group_res[0][i][j].text.size() << endl;
+                    return true;
+                }
+            }
+        }
+
+    }
+    return res;
+}
+
+//去掉第一行的干扰信息
+void FormOperator::filter_long_chi_str(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col){
+    //删除第一行识别结果
+    clusters_row.erase(clusters_row.begin());
+
+    vector<Bbox> tmp;
+    for (int i = 0; i < clusters_row.size(); i++){
+        for (int j = 0; j < clusters_row[i].size(); j++){
+            tmp.push_back(clusters_row[i][j]);
+        }
+    }
+    clusters_col.clear();
+    group_res.clear();
+
+    cluster_col(tmp, clusters_col);
+    group_clusters_res(group_res, clusters_row, clusters_col);
+
+}
+
 //将要运算的数字运算验证
 void FormOperator::compute(vector<vector<string>> &nums, int rule){
 
@@ -10,6 +51,12 @@ void FormOperator::compute(vector<vector<string>> &nums, int rule){
 
 bool string_blurry_match(string a, string b){
     if (a.length() == b.length()){
+        if (a == "金额"){
+            return a == b || b == "总价";
+        }
+        else if (a == "总价"){
+            return a == b || b == "金额";
+        }
         return a == b;
     }
     else if (a.length() < b.length()){
@@ -73,56 +120,56 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
 
 //        vector<int> rows{row};
         rows.push_back(row);
-        if (group_res.size() > (row + 2)){
-            for (int i = row + 1; i < group_res.size() - 1; i++)
-            {
-                if (!group_res[i][col].empty() && string_blurry_match(group_res[i][col][0].text, iter->first.first.second)){
+        if (group_res.size() > (row + 2)) {
+            for (int i = row + 1; i < group_res.size() - 1; i++) {
+                if (!group_res[i][col].empty() &&
+                    string_blurry_match(group_res[i][col][0].text, iter->first.first.second)) {
                     rows.push_back(i);
-                    for (int j = i + 1; j < group_res.size(); j++){
-                        if (!group_res[j][col].empty() && string_blurry_match(group_res[j][col][0].text, iter->first.second)){
+                    for (int j = i + 1; j < group_res.size(); j++) {
+                        if (!group_res[j][col].empty() &&
+                            string_blurry_match(group_res[j][col][0].text, iter->first.second)) {
                             rows.push_back(j);
                             break;
                         }
                     }
                 }
-                if (rows.size() == 3){
+                if (rows.size() == 3) {
                     res = iter->second;
                     break;
                 }
             }
-
-            if (rows.size() == 3){
+            if (rows.size() == 3) {
                 vector<string> tmp;
-                for (int i = col + 1; i < group_res[0].size(); i++){
+                for (int i = col + 1; i < group_res[0].size(); i++) {
                     tmp.clear();
-                    for (int j = 0; j < 3; j++){
-                        if (!group_res[rows[j]][i].empty() && (group_res[rows[j]][i][0].class_idx == 104 || group_res[rows[j]][i][0].class_idx == 101)){
+                    for (int j = 0; j < 3; j++) {
+                        if (!group_res[rows[j]][i].empty() &&
+                            (group_res[rows[j]][i][0].class_idx == 104 || group_res[rows[j]][i][0].class_idx == 101)) {
 //                            cout << "题目坐标： "<< rows[j] << " " << i << endl;
-                            if (group_res[rows[j]][i][0].text.empty()){
+                            if (group_res[rows[j]][i][0].text.empty()) {
                                 tmp.push_back("空");
-                            }
-                            else{
+                            } else {
                                 tmp.push_back(group_res[rows[j]][i][0].text);
                             }
-                        }
-                        else{
+                        } else {
                             break;
                         }
                     }
-                    if (tmp.size() == 3){
+                    if (tmp.size() == 3) {
                         nums.push_back(tmp);
                     }
                 }
             }
         }
-
-        if (rows.empty() && group_res[0].size() > (col + 2)){
+        if (rows.size() != 3 && group_res[0].size() > (col + 2)){
 //            vector<int> cols{col};
             cols.push_back(col);
             for (int i = col + 1; i < group_res[0].size() - 1; i++){
+//                cout << "pipei: " << group_res[row][i][0].text << " " << iter->first.first.second << endl;
                 if (!group_res[row][i].empty() && string_blurry_match(group_res[row][i][0].text, iter->first.first.second)){
                     cols.push_back(i);
                     for (int j = i + 1; j < group_res[0].size(); j++){
+//                        cout << "pipei2: " << group_res[row][j][0].text << " " << iter->first.second << endl;
                         if (!group_res[row][j].empty() && string_blurry_match(group_res[row][j][0].text, iter->first.second)){
                             cols.push_back(j);
                             break;
@@ -314,8 +361,11 @@ void FormOperator::splice_chi_char(vector<vector<vector<Bbox>>>& group_res)
                 {
                     for (int n = m + 1; n < group_res[i][j].size(); n++)
                     {
-                        //如果第二个连续的字符也是印刷体汉字
-                        if (group_res[i][j][n].class_idx == 100)
+//                        如果第二个连续的字符也是印刷体汉字，而且是在同一行
+                        int iou_min = max(group_res[i][j][m].y, group_res[i][j][n].y);
+                        int iou_max = min(group_res[i][j][m].y + group_res[i][j][m].height, \
+                                            group_res[i][j][n].y + group_res[i][j][n].height);
+                        if (group_res[i][j][n].class_idx == 100 && (iou_max - iou_min) > 0)
                         {
                             //合并连续的印刷体汉字
                             group_res[i][j][m].width = group_res[i][j][n].x + group_res[i][j][n].width - group_res[i][j][m].x;
@@ -733,10 +783,27 @@ bool FormOperator::comp_col(const vector<Bbox>& a, const vector<Bbox>& b){
 
 //对一个格子里面的box按从左到右排序
 bool FormOperator::comp_col_single(const Bbox a, const Bbox b) {
-    return a.x < b.x;
+//    if a.y < b.y
+    int iou_min = max(a.y, b.y);
+    int iou_max = min(a.y + a.height, b.y + b.height);
+    if (iou_max > iou_min){
+        return a.x < b.x;
+    }
+    else{
+        return a.y < b.y;
+    }
+//    return a.x < b.x;
 }
 
 bool FormOperator::comp_row_single(const Bbox a, const Bbox b) {
+//    int iou_min = max(a.y, b.y);
+//    int iou_max = min(a.y + a.height, b.y + b.height);
+//    if (iou_max > iou_min){
+//        return a.x < b.x;
+//    }
+//    else{
+//        return a.y < b.y;
+//    }
     return a.y < b.y;
 }
 

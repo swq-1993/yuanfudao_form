@@ -4,7 +4,7 @@
 int main() {
 
     FormOperator formOperator;
-    formOperator.ReadDataFromTxt("../box_info/166f6b30449f371.txt");
+    formOperator.ReadDataFromTxt("../box_info/166f6b752d90b30.txt");
 //    formOperator.ReadDataFromTxt("../test.txt");
 
     if (formOperator.file_content.empty()){
@@ -13,7 +13,7 @@ int main() {
     }
     formOperator.analysis(formOperator.file_content, formOperator.bboxs, formOperator.big_bboxs);
     cout << formOperator.bboxs.size() << endl;
-    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[0]);
+    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[3]);
     cout << "after filter: " << formOperator.bboxs.size() << endl;
     clock_t start, end;
     start = clock();
@@ -142,6 +142,47 @@ int main() {
         }
         cout << endl;
     }
+
+
+    while (formOperator.exist_long_chi(formOperator.group_res)){
+        cout << endl << "before filter: " << endl;
+        for (int i = 0; i < formOperator.group_res.size(); i++)
+        {
+            cout << "第" << i + 1 << "行：" << endl;
+            for (int j = 0; j < formOperator.group_res[i].size(); j++)
+            {
+
+                for (int m = 0; m < formOperator.group_res[i][j].size(); m++)
+                {
+//                cout << formOperator.group_res[i][j][m].x << " " << formOperator.group_res[i][j][m].y << " " << formOperator.group_res[i][j][m].text << " ";
+                    cout << formOperator.group_res[i][j][m].text << " ";
+                }
+                cout << " | ";
+            }
+            cout << endl;
+        }
+        formOperator.filter_long_chi_str(formOperator.group_res, formOperator.clusters_row, formOperator.clusters_col);
+        formOperator.splice_chi_char(formOperator.group_res);
+        cout << "after filter: " << endl;
+        for (int i = 0; i < formOperator.group_res.size(); i++)
+        {
+            cout << "第" << i + 1 << "行：" << endl;
+            for (int j = 0; j < formOperator.group_res[i].size(); j++)
+            {
+
+                for (int m = 0; m < formOperator.group_res[i][j].size(); m++)
+                {
+//                cout << formOperator.group_res[i][j][m].x << " " << formOperator.group_res[i][j][m].y << " " << formOperator.group_res[i][j][m].text << " ";
+                    cout << formOperator.group_res[i][j][m].text << " ";
+                }
+                cout << " | ";
+            }
+            cout << endl;
+        }
+
+    }
+
+//    cout << endl << "after filter:" << endl;
 
 //    unordered_map<pair<pair<string,string>, string>, int> stem;
 //    stem.insert(make_pair(make_pair(make_pair("单价", "数量"), "总价"), 2));
