@@ -4,7 +4,7 @@
 int main() {
 
     FormOperator formOperator;
-    formOperator.ReadDataFromTxt("../box_info/166f6b752d90b30.txt");
+    formOperator.ReadDataFromTxt("../box_info/166f6b03499c66d.txt");
 //    formOperator.ReadDataFromTxt("../test.txt");
 
     if (formOperator.file_content.empty()){
@@ -13,8 +13,12 @@ int main() {
     }
     formOperator.analysis(formOperator.file_content, formOperator.bboxs, formOperator.big_bboxs);
     cout << formOperator.bboxs.size() << endl;
-    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[3]);
+    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[1]);
     cout << "after filter: " << formOperator.bboxs.size() << endl;
+    for (int i = 0; i < formOperator.bboxs.size(); ++i) {
+        cout << formOperator.bboxs[i].text << " ";
+    }
+    cout << endl;
     clock_t start, end;
     start = clock();
 
