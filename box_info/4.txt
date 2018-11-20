@@ -1,0 +1,23 @@
+x:63 y:1 width:22 height:12 class_idx:100 text:一
+x:36 y:0 width:27 height:20 class_idx:100 text:因
+x:87 y:0 width:27 height:20 class_idx:100 text:从
+x:112 y:3 width:14 height:17 class_idx:100 text:O
+x:61 y:48 width:26 height:28 class_idx:100 text:乘
+x:86 y:49 width:28 height:26 class_idx:100 text:数
+x:69 y:177 width:30 height:27 class_idx:100 text:积
+x:61 y:111 width:25 height:29 class_idx:100 text:乘
+x:85 y:112 width:29 height:27 class_idx:100 text:数
+x:466 y:176 width:73 height:45 class_idx:101
+x:258 y:170 width:49 height:52 class_idx:101
+x:381 y:163 width:50 height:51 class_idx:101
+x:155 y:156 width:53 height:53 class_idx:101
+x:10 y:0 width:24 height:19 class_idx:102
+x:273 y:110 width:21 height:27 class_idx:104 text:3
+x:366 y:109 width:34 height:28 class_idx:104 text:23
+x:474 y:107 width:21 height:29 class_idx:104 text:6
+x:174 y:110 width:22 height:28 class_idx:104 text:2
+x:460 y:43 width:45 height:28 class_idx:104 text:300
+x:373 y:45 width:20 height:25 class_idx:104 text:3
+x:268 y:45 width:30 height:27 class_idx:104 text:31
+x:169 y:47 width:33 height:27 class_idx:104 text:42
+x:23 y:18 width:534 height:236 class_idx:200

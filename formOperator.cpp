@@ -3,6 +3,149 @@
 //
 #include "header.h"
 
+//获取非四则运算匹配之后的结果
+void FormOperator::get_normal_res(vector<vector<vector<Bbox>>>& group_res, vector<vector<string>>& nums, vector<int>& rows, vector<int>& cols){
+    vector<string> tmp;
+    cout << "coordinate: " << rows.size() << " " << cols.size() << endl;
+    if (cols.size() == 1){
+        int cur_col = cols[0];
+        for (int col = cur_col + 1; col < group_res[0].size(); col++){
+            tmp.clear();
+            for (int i = 0; i < rows.size(); i++){
+                if (!group_res[rows[i]][col].empty() &&
+                        (group_res[rows[i]][col][0].class_idx == 104 || group_res[rows[i]][col][0].class_idx == 101)){
+                    if (group_res[rows[i]][col][0].text.empty()){
+                        tmp.push_back("空");
+                    }
+                    else {
+                        tmp.push_back(group_res[rows[i]][col][0].text);
+                    }
+                }
+                else {
+                    tmp.push_back(" ");
+                }
+            }
+            nums.push_back(tmp);
+
+        }
+    }
+    else if (rows.size() == 1){
+        int cur_row = rows[0];
+        for (int row = cur_row + 1; row < group_res.size(); row++){
+            tmp.clear();
+
+            for (int i = 0; i < cols.size(); i++){
+
+                if (!group_res[row][cols[i]].empty() &&
+                        (group_res[row][cols[i]][0].class_idx == 104 || group_res[row][cols[i]][0].class_idx == 101)){
+
+                    if (group_res[row][cols[i]][0].text.empty()){
+                        tmp.push_back("空");
+                    }
+                    else {
+                        tmp.push_back(group_res[row][cols[i]][0].text);
+                    }
+                }
+                else {
+                    tmp.push_back(" ");
+                }
+
+            }
+
+            nums.push_back(tmp);
+        }
+    }
+
+}
+
+//非四则运算的匹配
+int FormOperator::match_normal_formula(vector<vector<vector<Bbox>>>& group_res, vector<int>& rows, vector<int>& cols){
+    bool find_row = false;
+    bool find_col = false;
+    int row = -1;
+    int col = -1;
+
+    for (int i = 0; i < group_res.size(); i++){
+        for (int j = 0; j < group_res[i].size(); j++){
+            if (group_res[i][j].empty() || group_res[i][j][0].class_idx != 100){
+                continue;
+            }
+            rows.clear();
+            cols.clear();
+            int start = 0;
+            while (start < normal_stem.size()){
+//                cout << "find: " << group_res[i][j][0].text << " " << normal_stem[start][0] << endl;
+                if (string_blurry_match(normal_stem[start][0], group_res[i][j][0].text) && group_res[i][j][0].text != "长方形"){
+                    row = i;
+                    col = j;
+
+                    //题干在一列，开始后面的匹配
+                    rows.push_back(row);
+//                    cout << "enter find_row" << endl;
+                    for (int index_stem = 1; index_stem < normal_stem[start].size() - 1; index_stem++){
+
+                        for (int index_row = row + 1; index_row < group_res.size(); index_row++){
+//                            cout << "pipei2: " << normal_stem[start][index_stem] << endl;
+                            if (!group_res[index_row][col].empty() &&
+                                    string_blurry_match(group_res[index_row][col][0].text, normal_stem[start][index_stem])){
+//                                cout << "find2: " << group_res[index_row][col][0].text << " " << normal_stem[start][index_stem] << endl;
+                                rows.push_back(index_row);
+                                break;
+                            }
+
+                        }
+                    }
+                    //刚好匹配到
+                    if (rows.size() == normal_stem[start].size() - 1){
+                        find_row = true;
+                        cols.push_back(col);
+                        return start;
+                    }
+                    else {
+                        rows.clear();
+                    }
+
+                    //题干在一行，开始后面的匹配
+                    if (!find_row){
+//                        cout << "enter find_col" << endl;
+                        cols.push_back(col);
+
+                        for (int index_stem = 1; index_stem < normal_stem[start].size() - 1; index_stem++){
+
+                            for (int index_col = col + 1; index_col < group_res[row].size(); index_col++){
+//                                cout << "pipei_col: " << normal_stem[start][index_stem] << endl;
+                                if (!group_res[row][index_col].empty() &&
+                                        string_blurry_match(group_res[row][index_col][0].text, normal_stem[start][index_stem])){
+//                                    cout << "find_col2: " << group_res[row][index_col][0].text << " " << normal_stem[start][index_stem] << endl;
+                                    cols.push_back(index_col);
+                                    break;
+                                }
+
+                            }
+                        }
+                        //刚刚匹配到
+                        if (cols.size() == normal_stem[start].size() - 1){
+                            find_col = true;
+                            rows.push_back(row);
+//                            break;
+                            return start;
+                        }
+                        else {
+                            cols.clear();
+                        }
+                    }
+
+                }
+
+                start++;
+            }
+        }
+    }
+
+    return -1;
+}
+
+
 //单独处理被除数、除数、商、余数这种情况
 bool FormOperator::is_has_remainder(vector<vector<vector<Bbox>>>& group_res, vector<int>& row_index, vector<int>& col_index){
     int row = -1;
@@ -42,18 +185,19 @@ bool FormOperator::is_has_remainder(vector<vector<vector<Bbox>>>& group_res, vec
                                 if (!group_res[m][col].empty() && group_res[m][col][0].text == "余数"){
                                     row_index.push_back(m);
                                     find_row = true;
-                                    break;
+                                    return true;
+//                                    break;
                                 }
                             }
                         }
-                        if (find_row){
-                            break;
-                        }
+//                        if (find_row){
+//                            break;
+//                        }
                     }
                 }
-                if (find_row){
-                    break;
-                }
+//                if (find_row){
+//                    break;
+//                }
             }
         }
         //按行寻找
@@ -68,17 +212,18 @@ bool FormOperator::is_has_remainder(vector<vector<vector<Bbox>>>& group_res, vec
                                 if (!group_res[row][m].empty() && group_res[row][m][0].text == "余数"){
                                     col_index.push_back(m);
                                     find_col = true;
-                                    break;
+                                    return true;
+//                                    break;
                                 }
                             }
-                            if (find_col){
-                                break;
-                            }
+//                            if (find_col){
+//                                break;
+//                            }
                         }
                     }
-                    if (find_col){
-                        break;
-                    }
+//                    if (find_col){
+//                        break;
+//                    }
                 }
             }
         }
@@ -88,30 +233,55 @@ bool FormOperator::is_has_remainder(vector<vector<vector<Bbox>>>& group_res, vec
 
 
 //判断第一行是否存在很长的中文字符串，这种长的中文字符串是不会出现在表格里面的，所以判定为表格外的干扰
-bool FormOperator::exist_long_chi(vector<vector<vector<Bbox>>>& group_res){
+//flag 为true时，判断第一行是否有干扰，为false时，判断最后一行是否有干扰
+bool FormOperator::exist_long_chi(vector<vector<vector<Bbox>>>& group_res, bool flag){
     bool res = false;
     if (group_res.empty()){
         return false;
     }
-    for (int i = 0; i < group_res[0].size(); i++){
-        if (!group_res[0].empty()){
-            for (int j = 0; j < group_res[0][i].size(); j++){
-                if (group_res[0][i][j].text.length() >= chi_length && group_res[0][i][j].class_idx == 100)
-                {
-                    cout << "判断要删除的字符串:" << group_res[0][i][j].text << " length:" << group_res[0][i][j].text.size() << endl;
-                    return true;
+    if (flag){
+        for (int i = 0; i < group_res[0].size(); i++){
+            if (!group_res[0].empty()){
+                for (int j = 0; j < group_res[0][i].size(); j++){
+                    if (group_res[0][i][j].text.length() > chi_length && group_res[0][i][j].class_idx == 100)
+                    {
+                        cout << "判断要删除的字符串:" << group_res[0][i][j].text << " length:" << group_res[0][i][j].text.size() << endl;
+                        return true;
+                    }
                 }
             }
-        }
 
+        }
     }
+    else {
+        for (int i = 0; i < group_res.back().size(); i++){
+            if (!group_res.back().empty()){
+                for (int j = 0; j < group_res.back()[i].size(); j++){
+                    if (group_res.back()[i][j].text.length() > chi_length && group_res.back()[i][j].class_idx == 100)
+                    {
+                        cout << "判断要删除的字符串:" << group_res.back()[i][j].text << " length:" << group_res.back()[i][j].text.size() << endl;
+                        return true;
+                    }
+                }
+            }
+
+        }
+    }
+
     return res;
 }
 
+
 //去掉第一行的题干干扰信息
-void FormOperator::filter_long_chi_str(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col){
+void FormOperator::filter_long_chi_str(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, \
+                                       vector<vector<Bbox>>& clusters_col, bool flag){
     //删除第一行识别结果
-    clusters_row.erase(clusters_row.begin());
+    if (flag){
+        clusters_row.erase(clusters_row.begin());
+    }
+    else {
+        clusters_row.pop_back();
+    }
 
     vector<Bbox> tmp;
     for (int i = 0; i < clusters_row.size(); i++){
@@ -132,7 +302,8 @@ void FormOperator::compute(vector<vector<string>> &nums, int rule){
 
 }
 
-bool string_blurry_match(string a, string b){
+//添加前缀匹配规则
+bool FormOperator::string_blurry_match(string a, string b){
     if (a.length() == b.length()){
         return a == b;
     }
@@ -169,6 +340,7 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
         res = 4;
         nums_size = 4;
         vector<string> tmp;
+        find = true;
         if (row_index.size() == 4){
             int cur_col = col_index[0];
             for (int i = cur_col + 1; i < group_res[0].size(); i++){
@@ -345,97 +517,16 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
             }
         }
 
-        /*if (find){
-            //题干在一列，且保证之后还有两行，找到剩下两行的位置
-            rows.push_back(row);
-            if (group_res.size() > (row + 2)) {
-                for (int i = row + 1; i < group_res.size() - 1; i++) {
-                    if (!group_res[i][col].empty() &&
-                        string_blurry_match(group_res[i][col][0].text, iter->first.first.second)) {
-                        rows.push_back(i);
-                        for (int j = i + 1; j < group_res.size(); j++) {
-                            if (!group_res[j][col].empty() &&
-                                string_blurry_match(group_res[j][col][0].text, iter->first.second)) {
-                                rows.push_back(j);
-                                break;
-                            }
-                        }
-                    }
-                    if (rows.size() == nums_size) {
-                        res = iter->second;
-                        break;
-                    }
-                }
-                if (rows.size() == nums_size) {
-                    vector<string> tmp;
-                    for (int i = col + 1; i < group_res[0].size(); i++) {
-                        tmp.clear();
-                        for (int j = 0; j < nums_size; j++) {
-                            if (!group_res[rows[j]][i].empty() &&
-                                (group_res[rows[j]][i][0].class_idx == 104 || group_res[rows[j]][i][0].class_idx == 101)) {
-//                            cout << "题目坐标： "<< rows[j] << " " << i << endl;
-                                if (group_res[rows[j]][i][0].text.empty()) {
-                                    tmp.push_back("空");
-                                } else {
-                                    tmp.push_back(group_res[rows[j]][i][0].text);
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                        if (tmp.size() == nums_size) {
-                            nums.push_back(tmp);
-                        }
-                    }
-                }
-            }
-            if (rows.size() != nums_size && group_res[0].size() > (col + 2)){
-                cols.push_back(col);
-                for (int i = col + 1; i < group_res[0].size() - 1; i++){
-//                cout << "pipei: " << group_res[row][i][0].text << " " << iter->first.first.second << endl;
-                    if (!group_res[row][i].empty() && string_blurry_match(group_res[row][i][0].text, iter->first.first.second)){
-                        cols.push_back(i);
-                        for (int j = i + 1; j < group_res[0].size(); j++){
-//                        cout << "pipei2: " << group_res[row][j][0].text << " " << iter->first.second << endl;
-                            if (!group_res[row][j].empty() && string_blurry_match(group_res[row][j][0].text, iter->first.second)){
-                                cols.push_back(j);
-                                break;
-                            }
-                        }
-                    }
-                    if (cols.size() == nums_size){
-                        res = iter->second;
-                        break;
-                    }
-                }
+    }
 
-                if (cols.size() == nums_size){
+    if (!find){
+        int find_normal = match_normal_formula(group_res, row_index, col_index);
+        cout << "find : " << find_normal << endl;
+        if (find_normal != -1){
+            get_normal_res(group_res, nums, row_index, col_index);
+            res = rule.size() + stoi(normal_stem[find_normal].back());
+        }
 
-                    vector<string> tmp;
-                    for (int i = row + 1; i < group_res.size(); i++){
-                        tmp.clear();
-                        for (int j = 0; j < nums_size; j++){
-                            if (!group_res[i][cols[j]].empty() && (group_res[i][cols[j]][0].class_idx == 104 || group_res[i][cols[j]][0].class_idx == 101)){
-//                            cout << "题目坐标： "<< i << " " << cols[j] << endl;
-                                if (group_res[i][cols[j]][0].text.empty()){
-                                    tmp.push_back("空");
-                                }
-                                else{
-                                    tmp.push_back(group_res[i][cols[j]][0].text);
-                                }
-                            }
-                            else{
-                                break;
-                            }
-                        }
-                        if (tmp.size() == nums_size){
-                            nums.push_back(tmp);
-                        }
-                    }
-                }
-            }
-
-        }*/
     }
 
     if (res != -1){
@@ -451,25 +542,10 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
 
 //将所给的题型初始化到指定数据结构
 void FormOperator::init(map< pair<pair <string,string>, string>, int >& stem_map) {
-//    map< pair<pair <string,string>, string>, int > mymap ;// declare map of pairs
-//    mymap[ make_pair(make_pair("单价","数量"), "总价") ] = 2 ; // map[key] =value
-//    mymap.insert(make_pair(make_pair(make_pair("单价","数量"), "路程"), 3));
-//    map< pair<pair <string,string>, string>, int >::iterator iter = mymap.begin();
-//    cout << iter->first.first.first << " " << iter->first.first.second << " " << iter->first.second << " " << iter->second << endl;
-//    iter++;
-//    cout << iter->first.first.first << " " << iter->first.first.second << " " << iter->first.second << " " << iter->second << endl;
-
     for (int i = 0; i < stem.size(); i++){
-        //stem_map[make_pair(make_pair(stem[i][0], stem[i][1]), stem[i][2])] = stoi(stem[i][3]);
-                stem_map.insert(make_pair(make_pair(make_pair(stem[i][0], stem[i][1]), stem[i][2]), stoi(stem[i][3])));
+        stem_map.insert(make_pair(make_pair(make_pair(stem[i][0], stem[i][1]), stem[i][2]), stoi(stem[i][3])));
     }
 
-//    map< pair<pair <string,string>, string>, int > :: iterator iter = stem_map.begin();
-//    while (iter != stem_map.end())
-//    {
-//        cout << iter->first.first.first << " " << iter->first.first.second << " " << iter->first.second << " " << iter->second << endl;
-//        iter++;
-//    }
 }
 
 //计算一行里面的bounding box的距离
@@ -512,6 +588,7 @@ vector<Bbox> FormOperator::intersection(vector<Bbox>& A, vector<Bbox>& B)
 
     return res;
 }
+
 //合并行、列的结果
 void FormOperator::group_clusters_res(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col) {
     int rows = clusters_row.size();
@@ -612,7 +689,7 @@ void FormOperator::cluster_row(vector<Bbox>& bboxs, vector<vector<Bbox>>& cluste
             cout << " " << (double)(0.5 * copy[j].height) << endl;*/
 //            if (Iou_max >= Iou_min)
             if ((double)(Iou_max - Iou_min) >= (double)(0.25 * copy[j].height) &&
-                copy[j].y < tmp_top + (tmp_bottom - tmp_top) * 0.5)
+                copy[j].y < tmp_top + (tmp_bottom - tmp_top) * 0.75)
             {
 
 //                cout << "合并" << endl;
@@ -675,19 +752,22 @@ void FormOperator::cluster_col(vector<Bbox>& bboxs, vector<vector<Bbox>>& cluste
             int Iou_min = max(tmp_left, copy[j].x);
             int Iou_max = min(tmp_right, copy[j].x + copy[j].width);
 
-           /* cout << "compare: " << copy[i].y << " " << copy[i].text << " " << copy[j].y << " " << copy[j].text << endl;
+            /*cout << "compare: " << copy[i].x << " " << copy[i].text << " " << copy[j].x << " " << copy[j].text << endl;
             cout << tmp_left << " " << tmp_right << endl;
             cout << (double)(Iou_max - Iou_min);
-//            cout << " " << (double)(0.5 * copy[j].height) << endl;*/
+            cout << " " << (double)(0.5 * copy[j].height) << endl;*/
             if (Iou_max >= Iou_min && copy[j].class_idx == 100){
+//                cout << "lianjie: " << copy[j].text << endl;
                 tmp.push_back(copy[j]);
                 tmp_left = min(tmp_left, copy[j].x);
                 tmp_right = max(tmp_right, copy[j].x + copy[j].width);
 
                 flag[j] = false;
             }
-            else if ((double)(Iou_max - Iou_min) >= (double)(0.25 * copy[j].width) &&
-                    copy[j].x <= tmp_left + (tmp_right - tmp_left) * 0.75){
+            else if ((double)(Iou_max - Iou_min) >= (0 * copy[j].width) &&
+                    copy[j].x <= tmp_left + (tmp_right - tmp_left) * 0.9){
+
+//                cout << "lianjie2: " << copy[j].text << endl;
                 tmp.push_back(copy[j]);
                 tmp_left = min(tmp_left, copy[j].x);
                 tmp_right = max(tmp_right, copy[j].x + copy[j].width);
@@ -1029,25 +1109,6 @@ void FormOperator::analysis(vector<string>& file_content, vector<Bbox>& bboxs, v
                 bboxs.push_back(bbox);
             }
 
-            /*if (class_id == "100" || class_id == "101" || class_id == "103" || class_id == "104") {
-                bbox.x = stoi(split_line(splitedLine[0], ':')[1]);
-                bbox.y = stoi(split_line(splitedLine[1], ':')[1]);
-                bbox.width = stoi(split_line(splitedLine[2], ':')[1]);
-                bbox.height = stoi(split_line(splitedLine[3], ':')[1]);
-                bbox.class_idx = stoi(split_line(splitedLine[4], ':')[1]);
-                if (splitedLine.size() == 6) {
-                    bbox.text = split_line(splitedLine[5], ':')[1];
-                }
-                bboxs.push_back(bbox);
-            }
-            else{
-                big_bbox.x = stoi(split_line(splitedLine[0], ':')[1]);
-                big_bbox.y = stoi(split_line(splitedLine[1], ':')[1]);
-                big_bbox.width = stoi(split_line(splitedLine[2], ':')[1]);
-                big_bbox.height = stoi(split_line(splitedLine[3], ':')[1]);
-                big_bbox.class_idx = stoi(split_line(splitedLine[4], ':')[1]);
-                big_bboxs.push_back(big_bbox);
-            }*/
         }
 
     }
@@ -1073,10 +1134,6 @@ void FormOperator::filter(vector<Bbox>& bboxs, Big_bbox big_bbox){
     }
     bboxs.clear();
     bboxs = tmp;
-//    sort(erase_index.begin(), erase_index.end(), greater<int>());
-//    for (int i = 0; i < erase_index.size(); i++){
-//        bboxs.erase(bboxs.begin() + i);
-//    }
 }
 
 //实现字符串的split函数
