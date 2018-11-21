@@ -35,10 +35,8 @@ void FormOperator::get_normal_res(vector<vector<vector<Bbox>>>& group_res, vecto
             tmp.clear();
 
             for (int i = 0; i < cols.size(); i++){
-
                 if (!group_res[row][cols[i]].empty() &&
                         (group_res[row][cols[i]][0].class_idx == 104 || group_res[row][cols[i]][0].class_idx == 101)){
-
                     if (group_res[row][cols[i]][0].text.empty()){
                         tmp.push_back("空");
                     }
@@ -51,7 +49,6 @@ void FormOperator::get_normal_res(vector<vector<vector<Bbox>>>& group_res, vecto
                 }
 
             }
-
             nums.push_back(tmp);
         }
     }
@@ -84,7 +81,10 @@ int FormOperator::match_normal_formula(vector<vector<vector<Bbox>>>& group_res, 
 //                    cout << "enter find_row" << endl;
                     for (int index_stem = 1; index_stem < normal_stem[start].size() - 1; index_stem++){
 
-                        for (int index_row = row + 1; index_row < group_res.size(); index_row++){
+                        for (int index_row = 0; index_row < group_res.size(); index_row++){
+                            if (index_row == row){
+                                continue;
+                            }
 //                            cout << "pipei2: " << normal_stem[start][index_stem] << endl;
                             if (!group_res[index_row][col].empty() &&
                                     string_blurry_match(group_res[index_row][col][0].text, normal_stem[start][index_stem])){
@@ -112,7 +112,10 @@ int FormOperator::match_normal_formula(vector<vector<vector<Bbox>>>& group_res, 
 
                         for (int index_stem = 1; index_stem < normal_stem[start].size() - 1; index_stem++){
 
-                            for (int index_col = col + 1; index_col < group_res[row].size(); index_col++){
+                            for (int index_col = 0; index_col < group_res[row].size(); index_col++){
+                                if (index_col == col){
+                                    continue;
+                                }
 //                                cout << "pipei_col: " << normal_stem[start][index_stem] << endl;
                                 if (!group_res[row][index_col].empty() &&
                                         string_blurry_match(group_res[row][index_col][0].text, normal_stem[start][index_stem])){
@@ -125,6 +128,7 @@ int FormOperator::match_normal_formula(vector<vector<vector<Bbox>>>& group_res, 
                         }
                         //刚刚匹配到
                         if (cols.size() == normal_stem[start].size() - 1){
+                            cout << "pipei dao" << endl;
                             find_col = true;
                             rows.push_back(row);
 //                            break;
@@ -144,7 +148,6 @@ int FormOperator::match_normal_formula(vector<vector<vector<Bbox>>>& group_res, 
 
     return -1;
 }
-
 
 //单独处理被除数、除数、商、余数这种情况
 bool FormOperator::is_has_remainder(vector<vector<vector<Bbox>>>& group_res, vector<int>& row_index, vector<int>& col_index){
@@ -315,7 +318,6 @@ void FormOperator::filter_useless_bbox(vector<vector<vector<Bbox>>>& group_res, 
     }
     bboxs.clear();
     bboxs = tmp;
-
 }
 
 //删除第一行的Bboxs
@@ -343,7 +345,6 @@ void FormOperator::filter_useless_bbox_firstrow(vector<vector<vector<Bbox>>>& gr
     }
     bboxs.clear();
     bboxs = tmp;
-
 }
 
 //去掉group_res其中某一个Bbox，并重新列聚类，行列分开操作
@@ -362,13 +363,6 @@ void FormOperator::filter_long_chi_str_bbox(vector<vector<vector<Bbox>>>& group_
 
 //去掉第一行的题干干扰信息
 void FormOperator::filter_long_chi(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col){
-    //删除第一行识别结果
-//    if (flag){
-//        clusters_row.erase(clusters_row.begin());
-//    }
-//    else {
-//        clusters_row.pop_back();
-//    }
 
     filter_useless_bbox_firstrow(group_res, bboxs);
     clusters_col.clear();
@@ -621,6 +615,7 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
         if (find_normal != -1){
             get_normal_res(group_res, nums, row_index, col_index);
             res = rule.size() + stoi(normal_stem[find_normal].back());
+//            cout << "res; " << res << endl;
         }
 
     }
@@ -673,9 +668,6 @@ vector<Bbox> FormOperator::intersection(vector<Bbox>& A, vector<Bbox>& B)
 
     map<pair<int, int>, Bbox> :: iterator iter = part_a.begin();
     while (iter != part_a.end()) {
-        /*if (part_b.find(iter->first) != part_b.end()) {
-            res.push_back(iter->second);
-        }*/
         if (part_b.find(make_pair(iter->first.first, iter->first.second)) != part_b.end()){
             res.push_back(iter->second);
         }
@@ -812,7 +804,7 @@ void FormOperator::cluster_col2(vector<vector<Bbox>>& clusters_row, vector<vecto
         for (int j = 0; j < clusters_row[i].size(); j++){
             for (int m = j + 1; m < clusters_row[i].size(); m++){
 
-                //合并相邻
+                //合并相邻的汉字
                 if ((clusters_row[i][m].x - clusters_row[i][j].x) < clusters_row[i][m].width &&
                     clusters_row[i][m].class_idx == 100 &&
                         clusters_row[i][j].class_idx == 100){

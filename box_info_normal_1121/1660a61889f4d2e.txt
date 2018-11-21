@@ -1,0 +1,60 @@
+x:604 y:603 width:45 height:40 class_idx:100 text:容
+x:321 y:965 width:43 height:41 class_idx:100 text:一
+x:398 y:956 width:42 height:43 class_idx:100 text:一
+x:469 y:948 width:45 height:42 class_idx:100 text:河
+x:599 y:435 width:44 height:38 class_idx:100 text:2
+x:371 y:450 width:50 height:48 class_idx:100 text:河
+x:450 y:448 width:48 height:47 class_idx:100 text:冲
+x:539 y:920 width:46 height:43 class_idx:100 text:导
+x:523 y:473 width:50 height:41 class_idx:100 text:5
+x:602 y:488 width:45 height:40 class_idx:100 text:温
+x:604 y:534 width:43 height:35 class_idx:100 text:子
+x:603 y:565 width:47 height:39 class_idx:100 text:谢
+x:532 y:625 width:47 height:44 class_idx:100 text:馋
+x:604 y:639 width:48 height:40 class_idx:100 text:如
+x:538 y:848 width:42 height:40 class_idx:100 text:如
+x:608 y:679 width:41 height:37 class_idx:100 text:比
+x:381 y:695 width:51 height:45 class_idx:100 text:钟
+x:459 y:689 width:45 height:46 class_idx:100 text:十
+x:308 y:701 width:43 height:44 class_idx:100 text:钟
+x:533 y:699 width:45 height:46 class_idx:100 text:牌
+x:607 y:716 width:45 height:37 class_idx:100 text:邮
+x:612 y:753 width:41 height:38 class_idx:100 text:今
+x:610 y:790 width:20 height:18 class_idx:100 text:白
+x:598 y:315 width:46 height:36 class_idx:100 text:四
+x:593 y:19 width:54 height:47 class_idx:100 text:洲
+x:355 y:48 width:48 height:33 class_idx:100 text:一
+x:269 y:56 width:54 height:52 class_idx:100 text:降
+x:439 y:61 width:49 height:48 class_idx:100 text:半
+x:594 y:64 width:50 height:44 class_idx:100 text:和
+x:356 y:80 width:49 height:49 class_idx:100 text:降
+x:517 y:85 width:47 height:46 class_idx:100 text:世
+x:273 y:100 width:51 height:50 class_idx:100 text:二
+x:430 y:103 width:59 height:50 class_idx:100 text:二
+x:598 y:108 width:42 height:40 class_idx:100 text:一
+x:359 y:125 width:47 height:46 class_idx:100 text:一
+x:270 y:144 width:59 height:46 class_idx:100 text:的
+x:440 y:150 width:48 height:44 class_idx:100 text:需
+x:595 y:153 width:48 height:38 class_idx:100 text:出
+x:364 y:171 width:44 height:42 class_idx:100 text:冲
+x:440 y:190 width:50 height:46 class_idx:100 text:同
+x:598 y:193 width:46 height:38 class_idx:100 text:冲
+x:361 y:209 width:48 height:70 class_idx:100 text:题
+x:442 y:234 width:48 height:44 class_idx:100 text:端
+x:597 y:231 width:48 height:43 class_idx:100 text:出
+x:278 y:225 width:55 height:84 class_idx:100 text:少
+x:597 y:274 width:48 height:37 class_idx:100 text:面
+x:682 y:271 width:62 height:53 class_idx:100 text:一
+x:600 y:354 width:47 height:39 class_idx:100 text:世
+x:375 y:869 width:63 height:91 class_idx:101
+x:464 y:833 width:60 height:102 class_idx:101
+x:304 y:840 width:62 height:55 class_idx:101
+x:435 y:30 width:49 height:31 class_idx:102
+x:672 y:441 width:72 height:64 class_idx:102
+x:305 y:650 width:45 height:44 class_idx:104 text:8
+x:462 y:641 width:40 height:43 class_idx:104 text:+
+x:384 y:645 width:43 height:43 class_idx:104 text:$FRACS$1$YOU$1/4$FRACE$
+x:375 y:418 width:40 height:31 class_idx:104 text:=
+x:294 y:419 width:46 height:34 class_idx:104 text:dm
+x:452 y:413 width:43 height:30 class_idx:104 text:(1)
+x:249 y:21 width:426 height:993 class_idx:200

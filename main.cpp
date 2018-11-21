@@ -5,10 +5,10 @@ int main() {
 
 //    string box_info_name = argv[1];
 
-    string box_info_clearname = "1670712b435275f.txt";
+    string box_info_clearname = "164a6a51c2ec7b7.txt";
 
     FormOperator formOperator;
-    string file_path = "../box_info_normal/" + box_info_clearname;
+    string file_path = "../box_info_normal_1121/" + box_info_clearname;
     cout << file_path << endl;
     formOperator.ReadDataFromTxt(file_path);
 //    formOperator.ReadDataFromTxt("../test.txt");
@@ -19,7 +19,7 @@ int main() {
     }
     formOperator.analysis(formOperator.file_content, formOperator.bboxs, formOperator.big_bboxs);
     cout << formOperator.bboxs.size() << endl;
-    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[1]);
+    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[0]);
     cout << "after filter: " << formOperator.bboxs.size() << endl;
     for (int i = 0; i < formOperator.bboxs.size(); ++i) {
         cout << formOperator.bboxs[i].text << " ";
@@ -233,10 +233,7 @@ int main() {
 
     }
 
-        start = clock();
     formOperator.init(formOperator.stem_map);
-    end = clock();
-    cout << "所有运算模式初始化时间: " << (double)(end - start) / CLOCKS_PER_SEC << endl;
 
     start = clock();
     formOperator.formula = formOperator.match_formula(formOperator.stem_map, formOperator.group_res);
@@ -245,7 +242,7 @@ int main() {
     cout << "题目运算方式： ";
 
         if (formOperator.formula == -1){
-            cout << "未识别运算" << endl;
+            cout << "未知运算" << endl;
         }
         else if (formOperator.formula >= formOperator.rule.size()){
             cout << formOperator.normal_rule[formOperator.formula - formOperator.rule.size()] << endl;
@@ -257,8 +254,4 @@ int main() {
     return 0;
 
 }
-
-
-
-
 
