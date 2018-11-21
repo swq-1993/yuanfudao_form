@@ -69,6 +69,7 @@ public:
     int formula = -1;
     int nums_size = 3; //默认是计算式是三个元素
     const int chi_length = 4 * 3;
+    const int chi_length_mid = 7 * 3;
     vector<string> file_content;
     vector<Bbox> bboxs;
     vector<Big_bbox> big_bboxs;
@@ -96,41 +97,33 @@ public:
             {"乘数", "乘数", "积", "2"},
             {"因数", "因数", "积", "2"},
             {"被除数", "除数", "商", "3"},
-            {"加数", "加数", "和", "0"},
             {"被减数", "减数", "差", "1"},
             {"单产量", "数量", "总价", "2"},
             {"被减数", "减数", "差", "1"},
+            {"加数", "加数", "和", "0"},
 
-            {"原有", "卖出", "还剩", "1"},
-            {"原有", "卖出", "剩下", "1"},
-            {"原有", "卖出", "现有", "1"},
+            {"原有", "卖出", "剩", "1"},
+            {"原有", "卖出", "有", "1"},
 
             {"原有", "借走", "还剩", "1"},
             {"原有", "吃了", "还剩", "1"},
             {"原有", "借走", "剩下", "1"},
             {"原有", "借走", "现有", "1"},
 
-            {"原来有", "卖出", "还剩", "1"},
-            {"原来有", "卖出", "剩下", "1"},
-            {"原来有", "卖出", "现有", "1"},
-
-            {"原来有", "借", "还剩", "1"},
-            {"原来有", "借", "剩下", "1"},
-            {"原来有", "借", "现有", "1"},
 
             {"总数量", "卖出", "还剩", "1"},
+            {"新进", "卖出", "还剩", "1"},
             {"借出", "还剩", "原有", "0"},
             {"借出", "还剩", "原来有", "0"},
-
-            {"原来有", "又买来", "一共有", "0"},
-            {"原来有", "又", "现", "0"},
-            {"原来有", "购进来", "一共有", "0"},
-            {"原来有", "购进来", "现有", "0"},
+            {"收入", "支出", "结余", "1"},
 
             {"原有", "又买来", "一共有", "0"},
             {"原有", "又买来", "现有", "0"},
             {"原有", "购进来", "一共有", "0"},
+            {"原有", "吃掉", "剩", "1"},
             {"原有", "购进", "现有", "0"},
+            {"购进", "卖出", "剩", "1"},
+            {"卖出", "剩", "原有", "0"},
 
             {"男生", "女生", "一共", "0"},
             {"总质量", "卖出", "还剩", "1"},
@@ -149,19 +142,18 @@ public:
     };
 
     //更加一般情况的运算法则
-    vector<string> normal_rule{"连加法", "连减法", "体积", "长方形周长", "正方形周长", "正方形面积",
-                                "长方形面积", "三角形面积", "平行四边形面积", "梯形面积", "除法", "圆周长面积"};
+    vector<string> normal_rule{"连加法", "连减法", "长方体体积", "长方形周长", "正方形周长", "正方形面积",
+                                "长方形面积", "三角形面积", "平行四边形面积", "梯形面积", "除法", "圆周长面积",
+                                "正方体表面积体积"};
 
     //更加一般的情况
     vector<vector<string>> normal_stem{
             {"一", "二", "三", "合计", "0"},
+            {"一", "二", "三", "总数", "0"},
             {"一", "二", "三", "四", "合计", "0"},
             {"金", "银", "铜", "总", "0"},
-            {"第一次", "第二次", "第三次", "合计", "0"},
-            {"第一次", "第二次", "第三次", "总数", "0"},
             {"原有", "花去", "花去", "还剩", "1"},
             {"原有", "卖出", "卖出", "还剩", "1"},
-            {"上", "下", "总", "0"},
             {"长", "宽", "高", "体积", "2"},
             {"长", "宽", "周长", "3"},
             {"边长", "周长", "4"},
@@ -172,11 +164,19 @@ public:
             {"班级", "总", "平均", "10"},
             {"半径", "直径", "周长", "面积", "11"},
             {"跳绳", "短跑", "跳远", "合计", "0"},
-            {"**", "**", "**", "总计", "0"}
+            {"棱长", "表面积", "体积", "12"},
+            {"做了", "做了", "一共", "0"},
+            {"杨树", "柳树", "松树", "总计", "0"}
 
     };
 
     vector<string> key_word{"长方形", "正方形", "三角形"};
+
+    //查看a是否是存在与b中
+    bool part_match(string a, string b);
+
+    //输出中间行的特别长的中文干扰
+    vector<int> exist_long_chi_mid(vector<vector<vector<Bbox>>>& group_res);
 
     //获取非四则运算匹配之后的结果
     void get_normal_res(vector<vector<vector<Bbox>>>& group_res, vector<vector<string>>& nums, vector<int>& rows, vector<int>& cols);
@@ -193,8 +193,18 @@ public:
     //判断第一行是否存在很长的中文字符串，这种长的中文字符串是不会出现在表格里面的，所以判定为表格外的干扰
     bool exist_long_chi(vector<vector<vector<Bbox>>>& group_res, bool flag);
 
+    //去掉group_res其中某一个Bbox，并重新列聚类，行列分开操作
+    void filter_long_chi_str_bbox(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, \
+                                vector<vector<Bbox>>& clusters_col, int row, int col, int num);
+
     //去掉第一行的干扰信息
-    void filter_long_chi_str(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col, bool flag);
+    void filter_long_chi(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col);
+
+    //输出干扰的bbox
+    void filter_useless_bbox(vector<vector<vector<Bbox>>>& group_res, vector<Bbox>& bboxs, int row, int col, int num);
+
+    //删除第一行的Bboxs
+    void filter_useless_bbox_firstrow(vector<vector<vector<Bbox>>>& group_res, vector<Bbox>& bboxs);
 
     //将要运算的数字运算验证
     void compute(vector<vector<string>>& nums, int rule);

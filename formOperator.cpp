@@ -6,7 +6,7 @@
 //获取非四则运算匹配之后的结果
 void FormOperator::get_normal_res(vector<vector<vector<Bbox>>>& group_res, vector<vector<string>>& nums, vector<int>& rows, vector<int>& cols){
     vector<string> tmp;
-    cout << "coordinate: " << rows.size() << " " << cols.size() << endl;
+//    cout << "coordinate: " << rows.size() << " " << cols.size() << endl;
     if (cols.size() == 1){
         int cur_col = cols[0];
         for (int col = cur_col + 1; col < group_res[0].size(); col++){
@@ -231,6 +231,29 @@ bool FormOperator::is_has_remainder(vector<vector<vector<Bbox>>>& group_res, vec
     return find_row || find_col;
 }
 
+//输出中间行的特别长的中文干扰
+vector<int> FormOperator::exist_long_chi_mid(vector<vector<vector<Bbox>>>& group_res){
+    vector<int> coord;
+    if (group_res.empty()){
+        return coord;
+    }
+    for (int i = 0; i < group_res.size(); i++){
+        for (int j = 0; j < group_res[i].size(); j++){
+            for (int m = 0; m < group_res[i][j].size(); m++){
+                if (group_res[i][j][m].text.length() > chi_length_mid &&
+                        group_res[i][j][m].class_idx == 100){
+                    cout << "判断要删除的字符串:  " << group_res[i][j][m].text << " length: " << group_res[i][j][m].text.length() << endl;
+                    coord.push_back(i);
+                    coord.push_back(j);
+                    coord.push_back(m);
+                    return coord;
+                }
+            }
+        }
+    }
+    return coord;
+}
+
 
 //判断第一行是否存在很长的中文字符串，这种长的中文字符串是不会出现在表格里面的，所以判定为表格外的干扰
 //flag 为true时，判断第一行是否有干扰，为false时，判断最后一行是否有干扰
@@ -245,7 +268,7 @@ bool FormOperator::exist_long_chi(vector<vector<vector<Bbox>>>& group_res, bool 
                 for (int j = 0; j < group_res[0][i].size(); j++){
                     if (group_res[0][i][j].text.length() > chi_length && group_res[0][i][j].class_idx == 100)
                     {
-                        cout << "判断要删除的字符串:" << group_res[0][i][j].text << " length:" << group_res[0][i][j].text.size() << endl;
+                        cout << "判断要删除的字符串:  " << group_res[0][i][j].text << " length:" << group_res[0][i][j].text.size() << endl;
                         return true;
                     }
                 }
@@ -259,7 +282,7 @@ bool FormOperator::exist_long_chi(vector<vector<vector<Bbox>>>& group_res, bool 
                 for (int j = 0; j < group_res.back()[i].size(); j++){
                     if (group_res.back()[i][j].text.length() > chi_length && group_res.back()[i][j].class_idx == 100)
                     {
-                        cout << "判断要删除的字符串:" << group_res.back()[i][j].text << " length:" << group_res.back()[i][j].text.size() << endl;
+                        cout << "判断要删除的字符串:  " << group_res.back()[i][j].text << " length:" << group_res.back()[i][j].text.size() << endl;
                         return true;
                     }
                 }
@@ -271,28 +294,89 @@ bool FormOperator::exist_long_chi(vector<vector<vector<Bbox>>>& group_res, bool 
     return res;
 }
 
-
-//去掉第一行的题干干扰信息
-void FormOperator::filter_long_chi_str(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, \
-                                       vector<vector<Bbox>>& clusters_col, bool flag){
-    //删除第一行识别结果
-    if (flag){
-        clusters_row.erase(clusters_row.begin());
-    }
-    else {
-        clusters_row.pop_back();
-    }
-
+//输出干扰的bbox
+void FormOperator::filter_useless_bbox(vector<vector<vector<Bbox>>>& group_res, vector<Bbox>& bboxs, int row, int col, int num){
     vector<Bbox> tmp;
-    for (int i = 0; i < clusters_row.size(); i++){
-        for (int j = 0; j < clusters_row[i].size(); j++){
-            tmp.push_back(clusters_row[i][j]);
+    int x = group_res[row][col][num].x;
+    int y = group_res[row][col][num].y;
+    int width = group_res[row][col][num].width;
+    int height = group_res[row][col][num].height;
+    for (int i = 0; i < bboxs.size(); i++){
+        int Iou_min_row = max(bboxs[i].x, x);
+        int Iou_max_row = min(bboxs[i].x + bboxs[i].width, x + width);
+        int Iou_min_col = max(bboxs[i].y, y);
+        int Iou_max_col = min(bboxs[i].y + bboxs[i].height, y + height);
+        if (Iou_max_row > Iou_min_row && Iou_max_col > Iou_min_col){
+            continue;
+        }
+        else {
+            tmp.push_back(bboxs[i]);
         }
     }
+    bboxs.clear();
+    bboxs = tmp;
+
+}
+
+//删除第一行的Bboxs
+void FormOperator::filter_useless_bbox_firstrow(vector<vector<vector<Bbox>>>& group_res, vector<Bbox>& bboxs){
+    int top = INT_MAX;
+    int bottom = -1;
+    vector<Bbox> tmp;
+    for (int i = 0; i < group_res[0].size(); i++){
+        for (int j = 0; j < group_res[0][i].size(); j++){
+            top = min(top, group_res[0][i][j].y);
+            bottom = max(bottom, group_res[0][i][j].y + group_res[0][i][j].height);
+        }
+    }
+
+    for (int i = 0; i < bboxs.size(); i++){
+        int Iou_min_col = max(bboxs[i].y, top);
+        int Iou_max_col = min(bboxs[i].y + bboxs[i].height, bottom);
+
+        if (Iou_max_col > Iou_min_col){
+            continue;
+        }
+        else{
+            tmp.push_back(bboxs[i]);
+        }
+    }
+    bboxs.clear();
+    bboxs = tmp;
+
+}
+
+//去掉group_res其中某一个Bbox，并重新列聚类，行列分开操作
+void FormOperator::filter_long_chi_str_bbox(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col, int row, int col, int num){
+
+    filter_useless_bbox(group_res, bboxs, row, col, num);
+
     clusters_col.clear();
+    clusters_row.clear();
+    group_res.clear();
+    cluster_col(bboxs, clusters_col);
+    cluster_row(bboxs, clusters_row);
+    group_clusters_res(group_res, clusters_row, clusters_col);
+
+}
+
+//去掉第一行的题干干扰信息
+void FormOperator::filter_long_chi(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col){
+    //删除第一行识别结果
+//    if (flag){
+//        clusters_row.erase(clusters_row.begin());
+//    }
+//    else {
+//        clusters_row.pop_back();
+//    }
+
+    filter_useless_bbox_firstrow(group_res, bboxs);
+    clusters_col.clear();
+    clusters_row.clear();
     group_res.clear();
 
-    cluster_col(tmp, clusters_col);
+    cluster_col(bboxs, clusters_col);
+    cluster_row(bboxs, clusters_row);
     group_clusters_res(group_res, clusters_row, clusters_col);
 
 }
@@ -302,26 +386,38 @@ void FormOperator::compute(vector<vector<string>> &nums, int rule){
 
 }
 
+//部分匹配字串，默认a的长度小于b
+bool FormOperator::part_match(string a, string b){
+    const char *show;
+    show = strstr(b.c_str(), a.c_str());
+    if (show == NULL){
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
 //添加前缀匹配规则
 bool FormOperator::string_blurry_match(string a, string b){
     if (a.length() == b.length()){
         return a == b;
     }
     else if (a.length() < b.length()){
-        for (int i = 0; i < a.length(); i++){
-            if (a[i] != b[i]){
-                return false;
-            }
+        if (part_match(a, b)){
+            return true;
         }
-        return true;
+        else {
+            return false;
+        }
     }
     else{
-        for (int i = 0; i < b.length(); i++){
-            if (a[i] != b[i]){
-                return false;
-            }
+        if (part_match(b, a)){
+            return true;
         }
-        return true;
+        else {
+            return false;
+        }
     }
 }
 
@@ -1029,7 +1125,7 @@ void FormOperator::group_col(vector<vector<Bbox>>& clusters, vector<Cluster_cent
 //按照上和左的位置进行排序
 bool FormOperator::compare(const Bbox a, const Bbox b) {
     if (a.y < b.y)
-        return a.x < b.x;
+        return true;
     else if (a.y == b.y)
         return a.x < b.x;
     else

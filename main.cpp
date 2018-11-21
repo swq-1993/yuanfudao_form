@@ -4,7 +4,8 @@
 int main() {
 
 //    string box_info_name = argv[1];
-    string box_info_clearname = "166cf7716da370b.txt";
+
+    string box_info_clearname = "1670712b435275f.txt";
 
     FormOperator formOperator;
     string file_path = "../box_info_normal/" + box_info_clearname;
@@ -18,7 +19,7 @@ int main() {
     }
     formOperator.analysis(formOperator.file_content, formOperator.bboxs, formOperator.big_bboxs);
     cout << formOperator.bboxs.size() << endl;
-    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[3]);
+    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[1]);
     cout << "after filter: " << formOperator.bboxs.size() << endl;
     for (int i = 0; i < formOperator.bboxs.size(); ++i) {
         cout << formOperator.bboxs[i].text << " ";
@@ -131,10 +132,7 @@ int main() {
     }
     cout << endl;
 
-    start = clock();
     formOperator.splice_chi_char(formOperator.group_res);
-    end = clock();
-    cout << "合并印刷体汉字耗时： " << (double)(end - start) / CLOCKS_PER_SEC << endl;
     cout << "合并印刷体汉字结果：" << endl;
     for (int i = 0; i < formOperator.group_res.size(); i++)
     {
@@ -153,7 +151,8 @@ int main() {
     }
 
 
-    while (formOperator.exist_long_chi(formOperator.group_res, true)){
+    //第一行存在较长的中文题目
+    if (formOperator.exist_long_chi(formOperator.group_res, true)){
         cout << endl << "before filter: " << endl;
         for (int i = 0; i < formOperator.group_res.size(); i++)
         {
@@ -170,8 +169,7 @@ int main() {
             }
             cout << endl;
         }
-        formOperator.filter_long_chi_str(formOperator.group_res, formOperator.clusters_row, formOperator.clusters_col,
-                                         true);
+        formOperator.filter_long_chi(formOperator.group_res, formOperator.clusters_row, formOperator.clusters_col);
         formOperator.splice_chi_char(formOperator.group_res);
         cout << "after filter: " << endl;
         for (int i = 0; i < formOperator.group_res.size(); i++)
@@ -192,8 +190,10 @@ int main() {
 
     }
 
-    while (formOperator.exist_long_chi(formOperator.group_res, false)){
-        cout << endl << "before filter: " << endl;
+    //处理中间行中某一行存在较长的中文
+    vector<int> coord = formOperator.exist_long_chi_mid(formOperator.group_res);
+    while (coord.size() == 3){
+        cout << endl << "before mid filter: " << endl;
         for (int i = 0; i < formOperator.group_res.size(); i++)
         {
             cout << "第" << i + 1 << "行：" << endl;
@@ -209,10 +209,10 @@ int main() {
             }
             cout << endl;
         }
-        formOperator.filter_long_chi_str(formOperator.group_res, formOperator.clusters_row, formOperator.clusters_col,
-                                         false);
+        formOperator.filter_long_chi_str_bbox(formOperator.group_res, formOperator.clusters_row, formOperator.clusters_col,
+                                         coord[0], coord[1], coord[2]);
         formOperator.splice_chi_char(formOperator.group_res);
-        cout << "after filter: " << endl;
+        cout << "after mid filter: " << endl;
         for (int i = 0; i < formOperator.group_res.size(); i++)
         {
             cout << "第" << i + 1 << "行：" << endl;
@@ -228,6 +228,8 @@ int main() {
             }
             cout << endl;
         }
+        coord.clear();
+        coord = formOperator.exist_long_chi_mid(formOperator.group_res);
 
     }
 
