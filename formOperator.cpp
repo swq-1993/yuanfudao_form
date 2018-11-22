@@ -260,41 +260,30 @@ vector<int> FormOperator::exist_long_chi_mid(vector<vector<vector<Bbox>>>& group
 
 //判断第一行是否存在很长的中文字符串，这种长的中文字符串是不会出现在表格里面的，所以判定为表格外的干扰
 //flag 为true时，判断第一行是否有干扰，为false时，判断最后一行是否有干扰
-bool FormOperator::exist_long_chi(vector<vector<vector<Bbox>>>& group_res, bool flag){
-    bool res = false;
+vector<vector<int>> FormOperator::exist_long_chi(vector<vector<vector<Bbox>>>& group_res){
+    vector<int> tmp;
+    vector<vector<int>> coord;
     if (group_res.empty()){
-        return false;
+        return coord;
     }
-    if (flag){
-        for (int i = 0; i < group_res[0].size(); i++){
-            if (!group_res[0].empty()){
-                for (int j = 0; j < group_res[0][i].size(); j++){
-                    if (group_res[0][i][j].text.length() > chi_length && group_res[0][i][j].class_idx == 100)
-                    {
-                        cout << "判断要删除的字符串:  " << group_res[0][i][j].text << " length:" << group_res[0][i][j].text.size() << endl;
-                        return true;
-                    }
+    for (int i = 0; i < group_res[0].size(); i++){
+        if (!group_res[0].empty()){
+            for (int j = 0; j < group_res[0][i].size(); j++){
+                if (group_res[0][i][j].text.length() > chi_length && group_res[0][i][j].class_idx == 100)
+                {
+                    cout << "判断要删除的字符串:  " << group_res[0][i][j].text << " length:" << group_res[0][i][j].text.size() << endl;
+                    tmp.push_back(0);
+                    tmp.push_back(i);
+                    tmp.push_back(j);
+                    coord.push_back(tmp);
+                    tmp.clear();
                 }
             }
-
         }
-    }
-    else {
-        for (int i = 0; i < group_res.back().size(); i++){
-            if (!group_res.back().empty()){
-                for (int j = 0; j < group_res.back()[i].size(); j++){
-                    if (group_res.back()[i][j].text.length() > chi_length && group_res.back()[i][j].class_idx == 100)
-                    {
-                        cout << "判断要删除的字符串:  " << group_res.back()[i][j].text << " length:" << group_res.back()[i][j].text.size() << endl;
-                        return true;
-                    }
-                }
-            }
 
-        }
     }
 
-    return res;
+    return coord;
 }
 
 //输出干扰的bbox
@@ -362,9 +351,11 @@ void FormOperator::filter_long_chi_str_bbox(vector<vector<vector<Bbox>>>& group_
 }
 
 //去掉第一行的题干干扰信息
-void FormOperator::filter_long_chi(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col){
+void FormOperator::filter_long_chi(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col, vector<vector<int>>& coord){
 
-    filter_useless_bbox_firstrow(group_res, bboxs);
+    for (int i = 0; i < coord.size(); i++){
+        filter_useless_bbox(group_res, bboxs, coord[i][0], coord[i][1], coord[i][2]);
+    }
     clusters_col.clear();
     clusters_row.clear();
     group_res.clear();
@@ -777,7 +768,7 @@ void FormOperator::cluster_row(vector<Bbox>& bboxs, vector<vector<Bbox>>& cluste
             cout << " " << (double)(0.5 * copy[j].height) << endl;*/
 //            if (Iou_max >= Iou_min)
             if ((double)(Iou_max - Iou_min) >= (double)(0.25 * copy[j].height) &&
-                copy[j].y < tmp_top + (tmp_bottom - tmp_top) * 0.75)
+                copy[j].y < tmp_top + (tmp_bottom - tmp_top) * 0.5)
             {
 
 //                cout << "合并" << endl;

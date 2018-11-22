@@ -5,7 +5,7 @@ int main() {
 
 //    string box_info_name = argv[1];
 
-    string box_info_clearname = "164a6a51c2ec7b7.txt";
+    string box_info_clearname = "166d3296d939042.txt";
 
     FormOperator formOperator;
     string file_path = "../box_info_normal_1121/" + box_info_clearname;
@@ -19,7 +19,7 @@ int main() {
     }
     formOperator.analysis(formOperator.file_content, formOperator.bboxs, formOperator.big_bboxs);
     cout << formOperator.bboxs.size() << endl;
-    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[0]);
+    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[4]);
     cout << "after filter: " << formOperator.bboxs.size() << endl;
     for (int i = 0; i < formOperator.bboxs.size(); ++i) {
         cout << formOperator.bboxs[i].text << " ";
@@ -151,8 +151,9 @@ int main() {
     }
 
 
-    //第一行存在较长的中文题目
-    if (formOperator.exist_long_chi(formOperator.group_res, true)){
+//    第一行存在较长的中文题目
+        vector<vector<int>> coord_first = formOperator.exist_long_chi(formOperator.group_res);
+    if (!coord_first.empty()){
         cout << endl << "before filter: " << endl;
         for (int i = 0; i < formOperator.group_res.size(); i++)
         {
@@ -169,7 +170,8 @@ int main() {
             }
             cout << endl;
         }
-        formOperator.filter_long_chi(formOperator.group_res, formOperator.clusters_row, formOperator.clusters_col);
+
+        formOperator.filter_long_chi(formOperator.group_res, formOperator.clusters_row, formOperator.clusters_col, coord_first);
         formOperator.splice_chi_char(formOperator.group_res);
         cout << "after filter: " << endl;
         for (int i = 0; i < formOperator.group_res.size(); i++)

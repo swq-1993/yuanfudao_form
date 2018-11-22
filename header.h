@@ -194,14 +194,14 @@ public:
     bool is_has_remainder(vector<vector<vector<Bbox>>>& group_res, vector<int>& row_index, vector<int>& col_index);
 
     //判断第一行是否存在很长的中文字符串，这种长的中文字符串是不会出现在表格里面的，所以判定为表格外的干扰
-    bool exist_long_chi(vector<vector<vector<Bbox>>>& group_res, bool flag);
+    vector<vector<int>> exist_long_chi(vector<vector<vector<Bbox>>>& group_res);
 
     //去掉group_res其中某一个Bbox，并重新列聚类，行列分开操作
     void filter_long_chi_str_bbox(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, \
                                 vector<vector<Bbox>>& clusters_col, int row, int col, int num);
 
     //去掉第一行的干扰信息
-    void filter_long_chi(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col);
+    void filter_long_chi(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col, vector<vector<int>>& coord);
 
     //输出干扰的bbox
     void filter_useless_bbox(vector<vector<vector<Bbox>>>& group_res, vector<Bbox>& bboxs, int row, int col, int num);
