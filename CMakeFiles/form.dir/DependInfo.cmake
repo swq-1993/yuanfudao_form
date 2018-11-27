@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/sunwanqi/CLionProjects/form/formOperator.cpp" "/Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles/form.dir/formOperator.cpp.o"
-  "/Users/sunwanqi/CLionProjects/form/main.cpp" "/Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles/form.dir/main.cpp.o"
+  "/Users/sunwanqi/Documents/yuanfudao_form/formOperator.cpp" "/Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles/form.dir/formOperator.cpp.o"
+  "/Users/sunwanqi/Documents/yuanfudao_form/main.cpp" "/Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles/form.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")
 

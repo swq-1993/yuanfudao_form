@@ -1,4 +1,3 @@
-/Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles/intersection.dir
-/Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles/form.dir
+/Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles/rebuild_cache.dir
+/Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles/edit_cache.dir
+/Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles/form.dir

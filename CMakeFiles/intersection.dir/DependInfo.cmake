@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/sunwanqi/CLionProjects/form/intersection.cpp" "/Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles/intersection.dir/intersection.cpp.o"
+  "/Users/sunwanqi/Documents/yuanfudao_form/intersection.cpp" "/Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles/intersection.dir/intersection.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")
 

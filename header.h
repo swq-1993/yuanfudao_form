@@ -32,7 +32,7 @@ struct Bbox{
     int width;
     int height;
     int class_idx;
-    string text = "空";
+    string text = "";
 };
 
 // 行、列检测框
@@ -77,6 +77,9 @@ public:
     vector<vector<Bbox>> clusters_col;
     vector<Cluster_center> centers_row;
     vector<Cluster_center> centers_col;
+
+    vector<vector<string>> nums_result;
+    vector<Bbox> result_boxs;
 
 
     vector<vector<vector<Bbox>>> group_res;
@@ -174,6 +177,12 @@ public:
     };
 
     vector<string> key_word{"长方形", "正方形", "三角形"};
+
+    //将解析的四则运算
+    void transform_result();
+
+    //调用整个识别运算规则
+    void run_result();
 
     //查看a是否是存在与b中
     bool part_match(string a, string b);

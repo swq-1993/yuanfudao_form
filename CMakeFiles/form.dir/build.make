@@ -43,10 +43,10 @@ RM = /Applications/CLion.app/Contents/bin/cmake/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/sunwanqi/CLionProjects/form
+CMAKE_SOURCE_DIR = /Users/sunwanqi/Documents/yuanfudao_form
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/sunwanqi/CLionProjects/form/cmake-build-debug
+CMAKE_BINARY_DIR = /Users/sunwanqi/Documents/yuanfudao_form
 
 # Include any dependencies generated for this target.
 include CMakeFiles/form.dir/depend.make
@@ -58,17 +58,17 @@ include CMakeFiles/form.dir/progress.make
 include CMakeFiles/form.dir/flags.make
 
 CMakeFiles/form.dir/main.cpp.o: CMakeFiles/form.dir/flags.make
-CMakeFiles/form.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/form.dir/main.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/form.dir/main.cpp.o -c /Users/sunwanqi/CLionProjects/form/main.cpp
+CMakeFiles/form.dir/main.cpp.o: main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/form.dir/main.cpp.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/form.dir/main.cpp.o -c /Users/sunwanqi/Documents/yuanfudao_form/main.cpp
 
 CMakeFiles/form.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/form.dir/main.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/sunwanqi/CLionProjects/form/main.cpp > CMakeFiles/form.dir/main.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/sunwanqi/Documents/yuanfudao_form/main.cpp > CMakeFiles/form.dir/main.cpp.i
 
 CMakeFiles/form.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/form.dir/main.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/sunwanqi/CLionProjects/form/main.cpp -o CMakeFiles/form.dir/main.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/sunwanqi/Documents/yuanfudao_form/main.cpp -o CMakeFiles/form.dir/main.cpp.s
 
 CMakeFiles/form.dir/main.cpp.o.requires:
 
@@ -82,17 +82,17 @@ CMakeFiles/form.dir/main.cpp.o.provides.build: CMakeFiles/form.dir/main.cpp.o
 
 
 CMakeFiles/form.dir/formOperator.cpp.o: CMakeFiles/form.dir/flags.make
-CMakeFiles/form.dir/formOperator.cpp.o: ../formOperator.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/form.dir/formOperator.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/form.dir/formOperator.cpp.o -c /Users/sunwanqi/CLionProjects/form/formOperator.cpp
+CMakeFiles/form.dir/formOperator.cpp.o: formOperator.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/form.dir/formOperator.cpp.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/form.dir/formOperator.cpp.o -c /Users/sunwanqi/Documents/yuanfudao_form/formOperator.cpp
 
 CMakeFiles/form.dir/formOperator.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/form.dir/formOperator.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/sunwanqi/CLionProjects/form/formOperator.cpp > CMakeFiles/form.dir/formOperator.cpp.i
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/sunwanqi/Documents/yuanfudao_form/formOperator.cpp > CMakeFiles/form.dir/formOperator.cpp.i
 
 CMakeFiles/form.dir/formOperator.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/form.dir/formOperator.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/sunwanqi/CLionProjects/form/formOperator.cpp -o CMakeFiles/form.dir/formOperator.cpp.s
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/sunwanqi/Documents/yuanfudao_form/formOperator.cpp -o CMakeFiles/form.dir/formOperator.cpp.s
 
 CMakeFiles/form.dir/formOperator.cpp.o.requires:
 
@@ -117,7 +117,7 @@ form: CMakeFiles/form.dir/main.cpp.o
 form: CMakeFiles/form.dir/formOperator.cpp.o
 form: CMakeFiles/form.dir/build.make
 form: CMakeFiles/form.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable form"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable form"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/form.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -135,6 +135,6 @@ CMakeFiles/form.dir/clean:
 .PHONY : CMakeFiles/form.dir/clean
 
 CMakeFiles/form.dir/depend:
-	cd /Users/sunwanqi/CLionProjects/form/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/sunwanqi/CLionProjects/form /Users/sunwanqi/CLionProjects/form /Users/sunwanqi/CLionProjects/form/cmake-build-debug /Users/sunwanqi/CLionProjects/form/cmake-build-debug /Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles/form.dir/DependInfo.cmake --color=$(COLOR)
+	cd /Users/sunwanqi/Documents/yuanfudao_form && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/sunwanqi/Documents/yuanfudao_form /Users/sunwanqi/Documents/yuanfudao_form /Users/sunwanqi/Documents/yuanfudao_form /Users/sunwanqi/Documents/yuanfudao_form /Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles/form.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/form.dir/depend
 

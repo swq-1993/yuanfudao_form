@@ -6,11 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/Users/sunwanqi/CLionProjects/form/formOperator.cpp
+/Users/sunwanqi/Documents/yuanfudao_form/formOperator.cpp
 header.h
-/Users/sunwanqi/CLionProjects/form/header.h
+/Users/sunwanqi/Documents/yuanfudao_form/header.h
 
-/Users/sunwanqi/CLionProjects/form/header.h
+/Users/sunwanqi/Documents/yuanfudao_form/header.h
 iostream
 -
 string
@@ -30,9 +30,9 @@ unordered_map
 map
 -
 
-/Users/sunwanqi/CLionProjects/form/main.cpp
+/Users/sunwanqi/Documents/yuanfudao_form/main.cpp
 time.h
 -
 header.h
-/Users/sunwanqi/CLionProjects/form/header.h
+/Users/sunwanqi/Documents/yuanfudao_form/header.h
 

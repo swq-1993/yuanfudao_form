@@ -3,6 +3,68 @@
 //
 #include "header.h"
 
+//将解析的四则运算
+void FormOperator::transform_result(){
+    vector<char> law{'+', '-', '*', '/'};
+    if (formula > 3 || formula < 0){
+        return;
+    }
+    if (nums_result.size() != result_boxs.size()){
+        cout << "算式中有未识别完整的式子" << endl;
+        return;
+    }
+    string tmp = "";
+    for (int i = 0; i < nums_result.size(); i++){
+        tmp = nums_result[i][0] + law[formula] + nums_result[i][1] + '=' + nums_result[i][2];
+        result_boxs[i].text = tmp;
+        tmp = "";
+    }
+}
+
+//调用整个识别运算规则
+void FormOperator::run_result()
+{
+    cluster_row(bboxs, clusters_row);
+    cluster_col(bboxs, clusters_col);
+    group_clusters_res(group_res, clusters_row, clusters_col);
+    splice_chi_char(group_res);
+    vector<vector<int>> coord_first = exist_long_chi(group_res);
+    if (!coord_first.empty()){
+        filter_long_chi(group_res, clusters_row, clusters_col, coord_first);
+        splice_chi_char(group_res);
+    }
+
+    vector<int> coord = exist_long_chi_mid(group_res);
+    while (coord.size() == 3){
+        filter_long_chi_str_bbox(group_res, clusters_row, clusters_col, coord[0], coord[1], coord[2]);
+        splice_chi_char(group_res);
+        coord.clear();
+        coord = exist_long_chi_mid(group_res);
+    }
+
+    init(stem_map);
+    formula = match_formula(stem_map, group_res);
+    if (formula == -1){
+        cout << "未知运算 " << endl;
+    }
+    else if (formula >= rule.size()){
+        cout << normal_rule[formula - rule.size()] << endl;
+    }
+    else {
+        cout << rule[formula] << endl;
+//        formula = -1;
+        transform_result();
+    }
+
+
+    for (int i = 0; i < result_boxs.size(); i++){
+        cout << result_boxs[i].text << endl;
+    }
+    cout << endl;
+}
+
+
+
 //获取非四则运算匹配之后的结果
 void FormOperator::get_normal_res(vector<vector<vector<Bbox>>>& group_res, vector<vector<string>>& nums, vector<int>& rows, vector<int>& cols){
     vector<string> tmp;
@@ -441,7 +503,7 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
                     }
                 }
                 if (tmp.size() == nums_size){
-                    nums.push_back(tmp);
+                    nums_result.push_back(tmp);
                 }
             }
         }
@@ -463,7 +525,7 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
                     }
                 }
                 if (tmp.size() == nums_size){
-                    nums.push_back(tmp);
+                    nums_result.push_back(tmp);
                 }
             }
         }
@@ -516,8 +578,11 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
                                         if (!group_res[rows[j]][i].empty() &&
                                             (group_res[rows[j]][i][0].class_idx == 104 || group_res[rows[j]][i][0].class_idx == 101)) {
 //                            cout << "题目坐标： "<< rows[j] << " " << i << endl;
+                                            if (group_res[rows[j]][i][0].class_idx == 101){
+                                                result_boxs.push_back(group_res[rows[j]][i][0]);
+                                            }
                                             if (group_res[rows[j]][i][0].text.empty()) {
-                                                tmp.push_back("空");
+                                                tmp.push_back("$BNK$");
                                             } else {
                                                 tmp.push_back(group_res[rows[j]][i][0].text);
                                             }
@@ -526,7 +591,7 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
                                         }
                                     }
                                     if (tmp.size() == nums_size) {
-                                        nums.push_back(tmp);
+                                        nums_result.push_back(tmp);
                                     }
                                 }
                             }
@@ -559,8 +624,11 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
                                     for (int j = 0; j < nums_size; j++){
                                         if (!group_res[i][cols[j]].empty() && (group_res[i][cols[j]][0].class_idx == 104 || group_res[i][cols[j]][0].class_idx == 101)){
 //                            cout << "题目坐标： "<< i << " " << cols[j] << endl;
+                                            if (group_res[i][cols[j]][0].class_idx == 101){
+                                                result_boxs.push_back(group_res[i][cols[j]][0]);
+                                            }
                                             if (group_res[i][cols[j]][0].text.empty()){
-                                                tmp.push_back("空");
+                                                tmp.push_back("$BNK$");
                                             }
                                             else{
                                                 tmp.push_back(group_res[i][cols[j]][0].text);
@@ -571,7 +639,7 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
                                         }
                                     }
                                     if (tmp.size() == nums_size){
-                                        nums.push_back(tmp);
+                                        nums_result.push_back(tmp);
                                     }
                                 }
                             }
@@ -611,14 +679,14 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
 
     }
 
-    if (res != -1){
-        for (int i = 0; i < nums.size(); i++){
-            for (int j = 0; j < nums[i].size(); j++){
-                cout << nums[i][j] << " ";
+    /*if (res != -1){
+        for (int i = 0; i < nums_result.size(); i++){
+            for (int j = 0; j < nums_result[i].size(); j++){
+                cout << nums_result[i][j] << " ";
             }
             cout << endl;
         }
-    }
+    }*/
     return res;
 }
 

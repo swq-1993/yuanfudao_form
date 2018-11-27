@@ -48,10 +48,10 @@ RM = /Applications/CLion.app/Contents/bin/cmake/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/sunwanqi/CLionProjects/form
+CMAKE_SOURCE_DIR = /Users/sunwanqi/Documents/yuanfudao_form
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/sunwanqi/CLionProjects/form/cmake-build-debug
+CMAKE_BINARY_DIR = /Users/sunwanqi/Documents/yuanfudao_form
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles /Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles /Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/sunwanqi/CLionProjects/form/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/sunwanqi/Documents/yuanfudao_form/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -109,19 +109,6 @@ preinstall/fast:
 depend:
 	$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
-
-#=============================================================================
-# Target rules for targets named intersection
-
-# Build rule for target.
-intersection: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 intersection
-.PHONY : intersection
-
-# fast build rule for target.
-intersection/fast:
-	$(MAKE) -f CMakeFiles/intersection.dir/build.make CMakeFiles/intersection.dir/build
-.PHONY : intersection/fast
 
 #=============================================================================
 # Target rules for targets named form
@@ -163,33 +150,6 @@ formOperator.cpp.s:
 	$(MAKE) -f CMakeFiles/form.dir/build.make CMakeFiles/form.dir/formOperator.cpp.s
 .PHONY : formOperator.cpp.s
 
-intersection.o: intersection.cpp.o
-
-.PHONY : intersection.o
-
-# target to build an object file
-intersection.cpp.o:
-	$(MAKE) -f CMakeFiles/intersection.dir/build.make CMakeFiles/intersection.dir/intersection.cpp.o
-.PHONY : intersection.cpp.o
-
-intersection.i: intersection.cpp.i
-
-.PHONY : intersection.i
-
-# target to preprocess a source file
-intersection.cpp.i:
-	$(MAKE) -f CMakeFiles/intersection.dir/build.make CMakeFiles/intersection.dir/intersection.cpp.i
-.PHONY : intersection.cpp.i
-
-intersection.s: intersection.cpp.s
-
-.PHONY : intersection.s
-
-# target to generate assembly for a file
-intersection.cpp.s:
-	$(MAKE) -f CMakeFiles/intersection.dir/build.make CMakeFiles/intersection.dir/intersection.cpp.s
-.PHONY : intersection.cpp.s
-
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -225,14 +185,10 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... intersection"
 	@echo "... form"
 	@echo "... formOperator.o"
 	@echo "... formOperator.i"
 	@echo "... formOperator.s"
-	@echo "... intersection.o"
-	@echo "... intersection.i"
-	@echo "... intersection.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

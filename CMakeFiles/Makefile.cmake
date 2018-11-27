@@ -30,10 +30,10 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/Applications/CLion.app/Contents/bin/cmake/share/cmake-3.10/Modules/Platform/Darwin.cmake"
   "/Applications/CLion.app/Contents/bin/cmake/share/cmake-3.10/Modules/Platform/UnixPaths.cmake"
   "/Applications/CLion.app/Contents/bin/cmake/share/cmake-3.10/Modules/ProcessorCount.cmake"
-  "../CMakeLists.txt"
   "CMakeFiles/3.10.3/CMakeCCompiler.cmake"
   "CMakeFiles/3.10.3/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.10.3/CMakeSystem.cmake"
+  "CMakeLists.txt"
   )
 
 # The corresponding makefile is:
@@ -49,6 +49,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/intersection.dir/DependInfo.cmake"
   "CMakeFiles/form.dir/DependInfo.cmake"
   )
