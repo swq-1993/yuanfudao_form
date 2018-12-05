@@ -15,7 +15,7 @@
 #include <cmath>
 #include <unordered_map>
 #include <map>
-using namespace std;
+//using namespace std;
 #define k 9
 
 // 定义行、列的范围
@@ -32,7 +32,7 @@ struct Bbox{
     int width;
     int height;
     int class_idx;
-    string text = "";
+    std::string text = "";
 };
 
 // 行、列检测框
@@ -42,7 +42,7 @@ struct Row_box{
     int width;
     int height;
     int row_col;
-    vector<Bbox> single_boxs;
+    std::vector<Bbox> single_boxs;
 };
 
 //大框和序号的检测框 200、201、202、203、102
@@ -70,26 +70,26 @@ public:
     int nums_size = 3; //默认是计算式是三个元素
     const int chi_length = 4 * 3;
     const int chi_length_mid = 7 * 3;
-    vector<string> file_content;
-    vector<Bbox> bboxs;
-    vector<Big_bbox> big_bboxs;
-    vector<vector<Bbox>> clusters_row;
-    vector<vector<Bbox>> clusters_col;
-    vector<Cluster_center> centers_row;
-    vector<Cluster_center> centers_col;
+    std::vector<std::string> file_content;
+    std::vector<Bbox> bboxs;
+    std::vector<Big_bbox> big_bboxs;
+    std::vector<std::vector<Bbox>> clusters_row;
+    std::vector<std::vector<Bbox>> clusters_col;
+    std::vector<Cluster_center> centers_row;
+    std::vector<Cluster_center> centers_col;
 
-    vector<vector<string>> nums_result;
-    vector<Bbox> result_boxs;
+    std::vector<std::vector<std::string>> nums_result;
+    std::vector<Bbox> result_boxs;
 
 
-    vector<vector<vector<Bbox>>> group_res;
+    std::vector<std::vector<std::vector<Bbox>>> group_res;
 
-    map< pair<pair <string,string>, string>, int > stem_map;
+    std::map< std::pair<std::pair <std::string,std::string>, std::string>, int > stem_map;
 
-    vector<string> rule{"加法", "减法", "乘法", "除法", "除法带余数"};
+    std::vector<std::string> rule{"加法", "减法", "乘法", "除法", "除法带余数"};
 
     //题干，之后可以在此扩充，设置四则运算分别为 0、1、2、3
-    vector<vector<string>> stem{
+    std::vector<std::vector<std::string>> stem{
 
             {"单价", "数量", "金额", "2"},
             {"数量", "单价", "总价", "2"},
@@ -146,12 +146,12 @@ public:
     };
 
     //更加一般情况的运算法则
-    vector<string> normal_rule{"连加法", "连减法", "长方体体积", "长方形周长", "正方形周长", "正方形面积",
+    std::vector<std::string> normal_rule{"连加法", "连减法", "长方体体积", "长方形周长", "正方形周长", "正方形面积",
                                 "长方形面积", "三角形面积", "平行四边形面积", "梯形面积", "除法", "圆周长面积",
                                 "正方体表面积体积", "圆柱体表面积体积"};
 
     //更加一般的情况
-    vector<vector<string>> normal_stem{
+    std::vector<std::vector<std::string>> normal_stem{
             {"一", "二", "三", "合计", "0"},
             {"一", "二", "三", "总数", "0"},
             {"一", "二", "三", "四", "合计", "0"},
@@ -176,7 +176,7 @@ public:
 
     };
 
-    vector<string> key_word{"长方形", "正方形", "三角形"};
+    std::vector<std::string> key_word{"长方形", "正方形", "三角形"};
 
     //将解析的四则运算
     void transform_result();
@@ -185,47 +185,47 @@ public:
     void run_result();
 
     //查看a是否是存在与b中
-    bool part_match(string a, string b);
+    bool part_match(std::string a, std::string b);
 
     //输出中间行的特别长的中文干扰
-    vector<int> exist_long_chi_mid(vector<vector<vector<Bbox>>>& group_res);
+    std::vector<int> exist_long_chi_mid(std::vector<std::vector<std::vector<Bbox>>>& group_res);
 
     //获取非四则运算匹配之后的结果
-    void get_normal_res(vector<vector<vector<Bbox>>>& group_res, vector<vector<string>>& nums, vector<int>& rows, vector<int>& cols);
+    void get_normal_res(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<std::vector<std::string>>& nums, std::vector<int>& rows, std::vector<int>& cols);
 
     //非四则运算的匹配
-    int match_normal_formula(vector<vector<vector<Bbox>>>& group_res, vector<int>& rows, vector<int>& cols);
+    int match_normal_formula(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<int>& rows, std::vector<int>& cols);
 
     //添加前缀匹配规则
-    bool string_blurry_match(string a, string b);
+    bool string_blurry_match(std::string a, std::string b);
 
     //单独处理被除数、除数、商、余数这种情况
-    bool is_has_remainder(vector<vector<vector<Bbox>>>& group_res, vector<int>& row_index, vector<int>& col_index);
+    bool is_has_remainder(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<int>& row_index, std::vector<int>& col_index);
 
     //判断第一行是否存在很长的中文字符串，这种长的中文字符串是不会出现在表格里面的，所以判定为表格外的干扰
-    vector<vector<int>> exist_long_chi(vector<vector<vector<Bbox>>>& group_res);
+    std::vector<std::vector<int>> exist_long_chi(std::vector<std::vector<std::vector<Bbox>>>& group_res);
 
     //去掉group_res其中某一个Bbox，并重新列聚类，行列分开操作
-    void filter_long_chi_str_bbox(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, \
-                                vector<vector<Bbox>>& clusters_col, int row, int col, int num);
+    void filter_long_chi_str_bbox(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<std::vector<Bbox>>& clusters_row, \
+                                std::vector<std::vector<Bbox>>& clusters_col, int row, int col, int num);
 
     //去掉第一行的干扰信息
-    void filter_long_chi(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col, vector<vector<int>>& coord);
+    void filter_long_chi(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<std::vector<Bbox>>& clusters_row, std::vector<std::vector<Bbox>>& clusters_col, std::vector<std::vector<int>>& coord);
 
     //输出干扰的bbox
-    void filter_useless_bbox(vector<vector<vector<Bbox>>>& group_res, vector<Bbox>& bboxs, int row, int col, int num);
+    void filter_useless_bbox(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<Bbox>& bboxs, int row, int col, int num);
 
     //删除第一行的Bboxs
-    void filter_useless_bbox_firstrow(vector<vector<vector<Bbox>>>& group_res, vector<Bbox>& bboxs);
+    void filter_useless_bbox_firstrow(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<Bbox>& bboxs);
 
     //将要运算的数字运算验证
-    void compute(vector<vector<string>>& nums, int rule);
+    void compute(std::vector<std::vector<std::string>>& nums, int rule);
 
     //根据拿下来的res，进行匹配运算规则
-    int match_formula(map< pair<pair <string,string>, string>, int >& stem_map, vector<vector<vector<Bbox>>>& group_res);
+    int match_formula(std::map< std::pair<std::pair <std::string,std::string>, std::string>, int >& stem_map, std::vector<std::vector<std::vector<Bbox>>>& group_res);
 
     //将所给的题型初始化到指定数据结构
-    void init(map< pair<pair <string,string>, string>, int >& stem_map);
+    void init(std::map< std::pair<std::pair <std::string,std::string>, std::string>, int >& stem_map);
 
     //用k-means实现聚类，来观察有几行几列
     //计算一行里面的bounding box的距离
@@ -237,43 +237,43 @@ public:
     //计算欧式距离
     double dist(const Cluster_center a, const Bbox b);
 
-    //查找两个vector的交集
-    vector<Bbox> intersection(vector<Bbox>& A, vector<Bbox>& B);
+    //查找两个std::vector的交集
+    std::vector<Bbox> intersection(std::vector<Bbox>& A, std::vector<Bbox>& B);
 
     //合并行、列的结果
-    void group_clusters_res(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col);
+    void group_clusters_res(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<std::vector<Bbox>>& clusters_row, std::vector<std::vector<Bbox>>& clusters_col);
 
     //拼接在一个格子的印刷体汉字
-    void splice_chi_char(vector<vector<vector<Bbox>>>& group_res);
+    void splice_chi_char(std::vector<std::vector<std::vector<Bbox>>>& group_res);
 
     //用IOU的思想对 行 进行聚类
-    void cluster_row(vector<Bbox>& bboxs, vector<vector<Bbox>>& clusters_row);
+    void cluster_row(std::vector<Bbox>& bboxs, std::vector<std::vector<Bbox>>& clusters_row);
 
     //根据 行聚类结果对 列 进行聚类
-    void cluster_col2(vector<vector<Bbox>>& clusters_row, vector<vector<vector<Bbox>>> group_res);
+    void cluster_col2(std::vector<std::vector<Bbox>>& clusters_row, std::vector<std::vector<std::vector<Bbox>>> group_res);
 
     //用IOU的思想对 列 进行聚类
-    void cluster_col(vector<Bbox>& bboxs, vector<vector<Bbox>>& clusters_col);
+    void cluster_col(std::vector<Bbox>& bboxs, std::vector<std::vector<Bbox>>& clusters_col);
 
     //计算簇内的平方误差
-    float getVar(vector<vector<Bbox>>& clusters, vector<Cluster_center>& centers, const int cur_k, bool row_or_col);
+    float getVar(std::vector<std::vector<Bbox>>& clusters, std::vector<Cluster_center>& centers, const int cur_k, bool row_or_col);
 
     //根据算与聚类中心的距离，分配
-    int cluster_of_tuple(vector<Cluster_center>& centers, Bbox bbox, const int cur_k, bool row_or_col);
+    int cluster_of_tuple(std::vector<Cluster_center>& centers, Bbox bbox, const int cur_k, bool row_or_col);
 
     //计算簇的中心
-    Cluster_center get_means(vector<Bbox>& clusters);
+    Cluster_center get_means(std::vector<Bbox>& clusters);
 
     //单个K的k-means算法
-    float k_means(vector<Bbox>& bboxs, const int cur_k, vector<vector<Bbox>>& clusters, vector<Cluster_center>& centers, bool row_or_col);
+    float k_means(std::vector<Bbox>& bboxs, const int cur_k, std::vector<std::vector<Bbox>>& clusters, std::vector<Cluster_center>& centers, bool row_or_col);
     //找最优的K值
-    int find_best_k(vector<Bbox>& bboxs, const int k_min, const int k_max, vector<vector<Bbox>>& clusters, vector<Cluster_center>& centers, bool row_or_col);
+    int find_best_k(std::vector<Bbox>& bboxs, const int k_min, const int k_max, std::vector<std::vector<Bbox>>& clusters, std::vector<Cluster_center>& centers, bool row_or_col);
 
     //group聚类行的结果
-    void group_row(vector<vector<Bbox>>& clusters, vector<Cluster_center>& centers);
+    void group_row(std::vector<std::vector<Bbox>>& clusters, std::vector<Cluster_center>& centers);
 
     //group聚类列的结果
-    void group_col(vector<vector<Bbox>>& clusters, vector<Cluster_center>& centers);
+    void group_col(std::vector<std::vector<Bbox>>& clusters, std::vector<Cluster_center>& centers);
 
     //按照上和左的位置进行排序
     static bool compare(const Bbox a, const Bbox b);
@@ -281,10 +281,10 @@ public:
     static bool compare_col(const Bbox a, const Bbox b);
 
     //行结果的排序规则
-    static bool comp_row(const vector<Bbox>& a, const vector<Bbox>& b);
+    static bool comp_row(const std::vector<Bbox>& a, const std::vector<Bbox>& b);
 
     //列结果的排序规则
-    static bool comp_col(const vector<Bbox>& a, const vector<Bbox>& b);
+    static bool comp_col(const std::vector<Bbox>& a, const std::vector<Bbox>& b);
 
     //对一个格子里面的box按从左到右排序
     static bool comp_col_single(const Bbox a, const Bbox b);
@@ -292,16 +292,16 @@ public:
     static bool comp_row_single(const Bbox a, const Bbox b);
 
     //将拆分下来的字符串，按照内容，封装到一个bounding box结构体对象里面
-    void analysis(vector<string>& file_content, vector<Bbox>& bboxs, vector<Big_bbox>& big_bboxs);
+    void analysis(std::vector<std::string>& file_content, std::vector<Bbox>& bboxs, std::vector<Big_bbox>& big_bboxs);
 
     //过滤掉大框外面的小框
-    void filter(vector<Bbox>& bboxs, Big_bbox big_bbox);
+    void filter(std::vector<Bbox>& bboxs, Big_bbox big_bbox);
 
     //实现字符串的split函数
-    vector<string> split_line(string single_line, char symbol);
+    std::vector<std::string> split_line(std::string single_line, char symbol);
 
     //从识别结果的TXT中读取数据到内存
-    void ReadDataFromTxt(string filename);
+    void ReadDataFromTxt(std::string filename);
 };
 
 #endif //FORM_HEADER_H

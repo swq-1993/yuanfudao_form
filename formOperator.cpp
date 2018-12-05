@@ -5,15 +5,15 @@
 
 //将解析的四则运算
 void FormOperator::transform_result(){
-    vector<char> law{'+', '-', '*', '/'};
+    std::vector<char> law{'+', '-', '*', '/'};
     if (formula > 3 || formula < 0){
         return;
     }
     if (nums_result.size() != result_boxs.size()){
-        cout << "算式中有未识别完整的式子" << endl;
+        std::cout << "算式中有未识别完整的式子" << std::endl;
         return;
     }
-    string tmp = "";
+    std::string tmp = "";
     for (int i = 0; i < nums_result.size(); i++){
         tmp = nums_result[i][0] + law[formula] + nums_result[i][1] + '=' + nums_result[i][2];
         result_boxs[i].text = tmp;
@@ -28,13 +28,13 @@ void FormOperator::run_result()
     cluster_col(bboxs, clusters_col);
     group_clusters_res(group_res, clusters_row, clusters_col);
     splice_chi_char(group_res);
-    vector<vector<int>> coord_first = exist_long_chi(group_res);
+    std::vector<std::vector<int>> coord_first = exist_long_chi(group_res);
     if (!coord_first.empty()){
         filter_long_chi(group_res, clusters_row, clusters_col, coord_first);
         splice_chi_char(group_res);
     }
 
-    vector<int> coord = exist_long_chi_mid(group_res);
+    std::vector<int> coord = exist_long_chi_mid(group_res);
     while (coord.size() == 3){
         filter_long_chi_str_bbox(group_res, clusters_row, clusters_col, coord[0], coord[1], coord[2]);
         splice_chi_char(group_res);
@@ -45,29 +45,28 @@ void FormOperator::run_result()
     init(stem_map);
     formula = match_formula(stem_map, group_res);
     if (formula == -1){
-        cout << "未知运算 " << endl;
+        std::cout << "未知运算 " << std::endl;
     }
     else if (formula >= rule.size()){
-        cout << normal_rule[formula - rule.size()] << endl;
+        std::cout << normal_rule[formula - rule.size()] << std::endl;
     }
     else {
-        cout << rule[formula] << endl;
+        std::cout << rule[formula] << std::endl;
 //        formula = -1;
         transform_result();
     }
 
-
-    for (int i = 0; i < result_boxs.size(); i++){
-        cout << result_boxs[i].text << endl;
-    }
-    cout << endl;
+//    for (int i = 0; i < result_boxs.size(); i++){
+//        cout << result_boxs[i].text << endl;
+//    }
+//    cout << endl;
 }
 
 
 
 //获取非四则运算匹配之后的结果
-void FormOperator::get_normal_res(vector<vector<vector<Bbox>>>& group_res, vector<vector<string>>& nums, vector<int>& rows, vector<int>& cols){
-    vector<string> tmp;
+void FormOperator::get_normal_res(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<std::vector<std::string>>& nums, std::vector<int>& rows, std::vector<int>& cols){
+    std::vector<std::string> tmp;
 //    cout << "coordinate: " << rows.size() << " " << cols.size() << endl;
     if (cols.size() == 1){
         int cur_col = cols[0];
@@ -118,7 +117,7 @@ void FormOperator::get_normal_res(vector<vector<vector<Bbox>>>& group_res, vecto
 }
 
 //非四则运算的匹配
-int FormOperator::match_normal_formula(vector<vector<vector<Bbox>>>& group_res, vector<int>& rows, vector<int>& cols){
+int FormOperator::match_normal_formula(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<int>& rows, std::vector<int>& cols){
     bool find_row = false;
     bool find_col = false;
     int row = -1;
@@ -190,7 +189,7 @@ int FormOperator::match_normal_formula(vector<vector<vector<Bbox>>>& group_res, 
                         }
                         //刚刚匹配到
                         if (cols.size() == normal_stem[start].size() - 1){
-                            cout << "pipei dao" << endl;
+                            std::cout << "pipei dao" << std::endl;
                             find_col = true;
                             rows.push_back(row);
 //                            break;
@@ -212,7 +211,7 @@ int FormOperator::match_normal_formula(vector<vector<vector<Bbox>>>& group_res, 
 }
 
 //单独处理被除数、除数、商、余数这种情况
-bool FormOperator::is_has_remainder(vector<vector<vector<Bbox>>>& group_res, vector<int>& row_index, vector<int>& col_index){
+bool FormOperator::is_has_remainder(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<int>& row_index, std::vector<int>& col_index){
     int row = -1;
     int col = -1;
     bool find = false;
@@ -297,8 +296,8 @@ bool FormOperator::is_has_remainder(vector<vector<vector<Bbox>>>& group_res, vec
 }
 
 //输出中间行的特别长的中文干扰
-vector<int> FormOperator::exist_long_chi_mid(vector<vector<vector<Bbox>>>& group_res){
-    vector<int> coord;
+std::vector<int> FormOperator::exist_long_chi_mid(std::vector<std::vector<std::vector<Bbox>>>& group_res){
+    std::vector<int> coord;
     if (group_res.empty()){
         return coord;
     }
@@ -307,7 +306,7 @@ vector<int> FormOperator::exist_long_chi_mid(vector<vector<vector<Bbox>>>& group
             for (int m = 0; m < group_res[i][j].size(); m++){
                 if (group_res[i][j][m].text.length() > chi_length_mid &&
                         group_res[i][j][m].class_idx == 100){
-                    cout << "判断要删除的字符串:  " << group_res[i][j][m].text << " length: " << group_res[i][j][m].text.length() << endl;
+                    std::cout << "判断要删除的字符串:  " << group_res[i][j][m].text << " length: " << group_res[i][j][m].text.length() << std::endl;
                     coord.push_back(i);
                     coord.push_back(j);
                     coord.push_back(m);
@@ -322,9 +321,9 @@ vector<int> FormOperator::exist_long_chi_mid(vector<vector<vector<Bbox>>>& group
 
 //判断第一行是否存在很长的中文字符串，这种长的中文字符串是不会出现在表格里面的，所以判定为表格外的干扰
 //flag 为true时，判断第一行是否有干扰，为false时，判断最后一行是否有干扰
-vector<vector<int>> FormOperator::exist_long_chi(vector<vector<vector<Bbox>>>& group_res){
-    vector<int> tmp;
-    vector<vector<int>> coord;
+std::vector<std::vector<int>> FormOperator::exist_long_chi(std::vector<std::vector<std::vector<Bbox>>>& group_res){
+    std::vector<int> tmp;
+    std::vector<std::vector<int>> coord;
     if (group_res.empty()){
         return coord;
     }
@@ -333,7 +332,7 @@ vector<vector<int>> FormOperator::exist_long_chi(vector<vector<vector<Bbox>>>& g
             for (int j = 0; j < group_res[0][i].size(); j++){
                 if (group_res[0][i][j].text.length() > chi_length && group_res[0][i][j].class_idx == 100)
                 {
-                    cout << "判断要删除的字符串:  " << group_res[0][i][j].text << " length:" << group_res[0][i][j].text.size() << endl;
+                    std::cout << "判断要删除的字符串:  " << group_res[0][i][j].text << " length:" << group_res[0][i][j].text.size() << std::endl;
                     tmp.push_back(0);
                     tmp.push_back(i);
                     tmp.push_back(j);
@@ -349,17 +348,17 @@ vector<vector<int>> FormOperator::exist_long_chi(vector<vector<vector<Bbox>>>& g
 }
 
 //输出干扰的bbox
-void FormOperator::filter_useless_bbox(vector<vector<vector<Bbox>>>& group_res, vector<Bbox>& bboxs, int row, int col, int num){
-    vector<Bbox> tmp;
+void FormOperator::filter_useless_bbox(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<Bbox>& bboxs, int row, int col, int num){
+    std::vector<Bbox> tmp;
     int x = group_res[row][col][num].x;
     int y = group_res[row][col][num].y;
     int width = group_res[row][col][num].width;
     int height = group_res[row][col][num].height;
     for (int i = 0; i < bboxs.size(); i++){
-        int Iou_min_row = max(bboxs[i].x, x);
-        int Iou_max_row = min(bboxs[i].x + bboxs[i].width, x + width);
-        int Iou_min_col = max(bboxs[i].y, y);
-        int Iou_max_col = min(bboxs[i].y + bboxs[i].height, y + height);
+        int Iou_min_row = std::max(bboxs[i].x, x);
+        int Iou_max_row = std::min(bboxs[i].x + bboxs[i].width, x + width);
+        int Iou_min_col = std::max(bboxs[i].y, y);
+        int Iou_max_col = std::min(bboxs[i].y + bboxs[i].height, y + height);
         if (Iou_max_row > Iou_min_row && Iou_max_col > Iou_min_col){
             continue;
         }
@@ -372,20 +371,20 @@ void FormOperator::filter_useless_bbox(vector<vector<vector<Bbox>>>& group_res, 
 }
 
 //删除第一行的Bboxs
-void FormOperator::filter_useless_bbox_firstrow(vector<vector<vector<Bbox>>>& group_res, vector<Bbox>& bboxs){
+void FormOperator::filter_useless_bbox_firstrow(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<Bbox>& bboxs){
     int top = INT_MAX;
     int bottom = -1;
-    vector<Bbox> tmp;
+    std::vector<Bbox> tmp;
     for (int i = 0; i < group_res[0].size(); i++){
         for (int j = 0; j < group_res[0][i].size(); j++){
-            top = min(top, group_res[0][i][j].y);
-            bottom = max(bottom, group_res[0][i][j].y + group_res[0][i][j].height);
+            top = std::min(top, group_res[0][i][j].y);
+            bottom = std::max(bottom, group_res[0][i][j].y + group_res[0][i][j].height);
         }
     }
 
     for (int i = 0; i < bboxs.size(); i++){
-        int Iou_min_col = max(bboxs[i].y, top);
-        int Iou_max_col = min(bboxs[i].y + bboxs[i].height, bottom);
+        int Iou_min_col = std::max(bboxs[i].y, top);
+        int Iou_max_col = std::min(bboxs[i].y + bboxs[i].height, bottom);
 
         if (Iou_max_col > Iou_min_col){
             continue;
@@ -399,7 +398,7 @@ void FormOperator::filter_useless_bbox_firstrow(vector<vector<vector<Bbox>>>& gr
 }
 
 //去掉group_res其中某一个Bbox，并重新列聚类，行列分开操作
-void FormOperator::filter_long_chi_str_bbox(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col, int row, int col, int num){
+void FormOperator::filter_long_chi_str_bbox(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<std::vector<Bbox>>& clusters_row, std::vector<std::vector<Bbox>>& clusters_col, int row, int col, int num){
 
     filter_useless_bbox(group_res, bboxs, row, col, num);
 
@@ -413,7 +412,7 @@ void FormOperator::filter_long_chi_str_bbox(vector<vector<vector<Bbox>>>& group_
 }
 
 //去掉第一行的题干干扰信息
-void FormOperator::filter_long_chi(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col, vector<vector<int>>& coord){
+void FormOperator::filter_long_chi(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<std::vector<Bbox>>& clusters_row, std::vector<std::vector<Bbox>>& clusters_col, std::vector<std::vector<int>>& coord){
 
     for (int i = 0; i < coord.size(); i++){
         filter_useless_bbox(group_res, bboxs, coord[i][0], coord[i][1], coord[i][2]);
@@ -429,12 +428,12 @@ void FormOperator::filter_long_chi(vector<vector<vector<Bbox>>>& group_res, vect
 }
 
 //将要运算的数字运算验证
-void FormOperator::compute(vector<vector<string>> &nums, int rule){
+void FormOperator::compute(std::vector<std::vector<std::string>> &nums, int rule){
 
 }
 
 //部分匹配字串，默认a的长度小于b
-bool FormOperator::part_match(string a, string b){
+bool FormOperator::part_match(std::string a, std::string b){
     const char *show;
     show = strstr(b.c_str(), a.c_str());
     if (show == NULL){
@@ -446,7 +445,7 @@ bool FormOperator::part_match(string a, string b){
 }
 
 //添加前缀匹配规则
-bool FormOperator::string_blurry_match(string a, string b){
+bool FormOperator::string_blurry_match(std::string a, std::string b){
     if (a.length() == b.length()){
         return a == b;
     }
@@ -469,20 +468,20 @@ bool FormOperator::string_blurry_match(string a, string b){
 }
 
 //根据拿下来的res，进行匹配运算规则
-int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& stem_map, vector<vector<vector<Bbox>>>& group_res)
+int FormOperator::match_formula(std::map< std::pair<std::pair <std::string,std::string>, std::string>, int >& stem_map, std::vector<std::vector<std::vector<Bbox>>>& group_res)
 {
     int res = -1;
     bool find = false;
     int row = -1;
     int col = -1;
-    vector<int> row_index;
-    vector<int> col_index;
-    vector<vector<string>> nums;
+    std::vector<int> row_index;
+    std::vector<int> col_index;
+    std::vector<std::vector<std::string>> nums;
     bool res_reminder = is_has_remainder(group_res, row_index, col_index);
     if (res_reminder){
         res = 4;
         nums_size = 4;
-        vector<string> tmp;
+        std::vector<std::string> tmp;
         find = true;
         if (row_index.size() == 4){
             int cur_col = col_index[0];
@@ -531,9 +530,9 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
         }
     }
     else {
-        map< pair<pair <string,string>, string>, int > :: iterator iter;
-        vector<int> rows;
-        vector<int> cols;
+        std::map< std::pair<std::pair <std::string,std::string>, std::string>, int > :: iterator iter;
+        std::vector<int> rows;
+        std::vector<int> cols;
         for (int i = 0; i < group_res.size(); i++) {
             for (int j = 0; j < group_res[i].size(); j++) {
                 if (group_res[i][j].empty() || group_res[i][j][0].class_idx != 100){
@@ -571,7 +570,7 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
                                 }
                             }
                             if (rows.size() == nums_size) {
-                                vector<string> tmp;
+                                std::vector<std::string> tmp;
                                 for (int i = col + 1; i < group_res[0].size(); i++) {
                                     tmp.clear();
                                     for (int j = 0; j < nums_size; j++) {
@@ -618,7 +617,7 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
 
                             if (cols.size() == nums_size){
 
-                                vector<string> tmp;
+                                std::vector<std::string> tmp;
                                 for (int i = row + 1; i < group_res.size(); i++){
                                     tmp.clear();
                                     for (int j = 0; j < nums_size; j++){
@@ -670,7 +669,7 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
 
     if (!find){
         int find_normal = match_normal_formula(group_res, row_index, col_index);
-        cout << "find : " << find_normal << endl;
+        std::cout << "find : " << find_normal << std::endl;
         if (find_normal != -1){
             get_normal_res(group_res, nums, row_index, col_index);
             res = rule.size() + stoi(normal_stem[find_normal].back());
@@ -691,7 +690,7 @@ int FormOperator::match_formula(map< pair<pair <string,string>, string>, int >& 
 }
 
 //将所给的题型初始化到指定数据结构
-void FormOperator::init(map< pair<pair <string,string>, string>, int >& stem_map) {
+void FormOperator::init(std::map< std::pair<std::pair <std::string,std::string>, std::string>, int >& stem_map) {
     for (int i = 0; i < stem.size(); i++){
         stem_map.insert(make_pair(make_pair(make_pair(stem[i][0], stem[i][1]), stem[i][2]), stoi(stem[i][3])));
     }
@@ -713,21 +712,21 @@ double FormOperator::dist(const Cluster_center a, const Bbox b) {
     return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
 
-//查找两个vector的交集
-vector<Bbox> FormOperator::intersection(vector<Bbox>& A, vector<Bbox>& B)
+//查找两个std::vector的交集
+std::vector<Bbox> FormOperator::intersection(std::vector<Bbox>& A, std::vector<Bbox>& B)
 {
-    vector<Bbox> res;
-    map<pair<int, int>, Bbox>part_a, part_b;
+    std::vector<Bbox> res;
+    std::map<std::pair<int, int>, Bbox>part_a, part_b;
     for(auto a : A) {
-        part_a.insert(make_pair(make_pair(a.x, a.y), a));
+        part_a.insert(std::make_pair(std::make_pair(a.x, a.y), a));
     }
     for (auto b : B) {
-        part_b.insert(make_pair(make_pair(b.x, b.y), b));
+        part_b.insert(std::make_pair(std::make_pair(b.x, b.y), b));
     }
 
-    map<pair<int, int>, Bbox> :: iterator iter = part_a.begin();
+    std::map<std::pair<int, int>, Bbox> :: iterator iter = part_a.begin();
     while (iter != part_a.end()) {
-        if (part_b.find(make_pair(iter->first.first, iter->first.second)) != part_b.end()){
+        if (part_b.find(std::make_pair(iter->first.first, iter->first.second)) != part_b.end()){
             res.push_back(iter->second);
         }
         iter++;
@@ -737,11 +736,11 @@ vector<Bbox> FormOperator::intersection(vector<Bbox>& A, vector<Bbox>& B)
 }
 
 //合并行、列的结果
-void FormOperator::group_clusters_res(vector<vector<vector<Bbox>>>& group_res, vector<vector<Bbox>>& clusters_row, vector<vector<Bbox>>& clusters_col) {
+void FormOperator::group_clusters_res(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<std::vector<Bbox>>& clusters_row, std::vector<std::vector<Bbox>>& clusters_col) {
     int rows = clusters_row.size();
     int cols = clusters_col.size();
-    vector<Bbox> tmp;
-    vector<vector<Bbox>> tmp_row;
+    std::vector<Bbox> tmp;
+    std::vector<std::vector<Bbox>> tmp_row;
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < cols; j++)
@@ -765,7 +764,7 @@ void FormOperator::group_clusters_res(vector<vector<vector<Bbox>>>& group_res, v
 }
 
 //拼接在一个格子的印刷体汉字
-void FormOperator::splice_chi_char(vector<vector<vector<Bbox>>>& group_res)
+void FormOperator::splice_chi_char(std::vector<std::vector<std::vector<Bbox>>>& group_res)
 {
     for (int i = 0; i < group_res.size(); i++)
     {
@@ -780,15 +779,15 @@ void FormOperator::splice_chi_char(vector<vector<vector<Bbox>>>& group_res)
                     for (int n = m + 1; n < group_res[i][j].size(); n++)
                     {
 //                        如果第二个连续的字符也是印刷体汉字，而且是在同一行
-                        int iou_min = max(group_res[i][j][m].y, group_res[i][j][n].y);
-                        int iou_max = min(group_res[i][j][m].y + group_res[i][j][m].height, \
+                        int iou_min = std::max(group_res[i][j][m].y, group_res[i][j][n].y);
+                        int iou_max = std::min(group_res[i][j][m].y + group_res[i][j][m].height, \
                                             group_res[i][j][n].y + group_res[i][j][n].height);
                         if (group_res[i][j][n].class_idx == 100 && (iou_max - iou_min) > 0)
                         {
                             //合并连续的印刷体汉字
                             group_res[i][j][m].width = group_res[i][j][n].x + group_res[i][j][n].width - group_res[i][j][m].x;
-                            group_res[i][j][m].y = min(group_res[i][j][m].y, group_res[i][j][n].y);
-                            group_res[i][j][m].height = max(group_res[i][j][m].y + group_res[i][j][m].height, \
+                            group_res[i][j][m].y = std::min(group_res[i][j][m].y, group_res[i][j][n].y);
+                            group_res[i][j][m].height = std::max(group_res[i][j][m].y + group_res[i][j][m].height, \
                                                                 group_res[i][j][n].y + group_res[i][j][n].height) - group_res[i][j][m].y;
                             group_res[i][j][m].text += group_res[i][j][n].text;
 
@@ -808,12 +807,12 @@ void FormOperator::splice_chi_char(vector<vector<vector<Bbox>>>& group_res)
 }
 
 //用IOU的思想对 行 进行聚类
-void FormOperator::cluster_row(vector<Bbox>& bboxs, vector<vector<Bbox>>& clusters_row)
+void FormOperator::cluster_row(std::vector<Bbox>& bboxs, std::vector<std::vector<Bbox>>& clusters_row)
 {
-    vector<Bbox> copy = bboxs;
+    std::vector<Bbox> copy = bboxs;
     sort(bboxs.begin(), bboxs.end(), compare);
-    vector<bool> flag(copy.size(), true);
-    vector<Bbox> tmp;
+    std::vector<bool> flag(copy.size(), true);
+    std::vector<Bbox> tmp;
     for (int i = 0; i < copy.size(); i++)
     {
         if (!flag[i]){
@@ -828,8 +827,8 @@ void FormOperator::cluster_row(vector<Bbox>& bboxs, vector<vector<Bbox>>& cluste
             if (!flag[j]){
                 continue;
             }
-            int Iou_min = max(tmp_top, copy[j].y);
-            int Iou_max = min(tmp_bottom, copy[j].y + copy[j].height);
+            int Iou_min = std::max(tmp_top, copy[j].y);
+            int Iou_max = std::min(tmp_bottom, copy[j].y + copy[j].height);
             /*cout << "compare: " << copy[i].y << " " << copy[i].text << " " << copy[j].y << " " << copy[j].text << endl;
             cout << tmp_top << " " << tmp_bottom << endl;
             cout << (double)(Iou_max - Iou_min);
@@ -841,8 +840,8 @@ void FormOperator::cluster_row(vector<Bbox>& bboxs, vector<vector<Bbox>>& cluste
 
 //                cout << "合并" << endl;
                 tmp.push_back(copy[j]);
-                tmp_top = min(tmp_top, copy[j].y);
-                tmp_bottom = max(tmp_bottom, copy[j].y + copy[j].height);
+                tmp_top = std::min(tmp_top, copy[j].y);
+                tmp_bottom = std::max(tmp_bottom, copy[j].y + copy[j].height);
 
 //                copy.erase(copy.begin() + j);
                 flag[j] = false;
@@ -855,10 +854,10 @@ void FormOperator::cluster_row(vector<Bbox>& bboxs, vector<vector<Bbox>>& cluste
     sort(clusters_row.begin(), clusters_row.end(), comp_row);
 }
 
-void FormOperator::cluster_col2(vector<vector<Bbox>>& clusters_row, vector<vector<vector<Bbox>>> group_res){
+void FormOperator::cluster_col2(std::vector<std::vector<Bbox>>& clusters_row, std::vector<std::vector<std::vector<Bbox>>> group_res){
 
-    vector<Bbox> tmp;
-    vector<vector<bool>> flag;
+    std::vector<Bbox> tmp;
+    std::vector<std::vector<bool>> flag;
     for (int i = 0; i < clusters_row.size(); i++){
         for (int j = 0; j < clusters_row[i].size(); j++){
             for (int m = j + 1; m < clusters_row[i].size(); m++){
@@ -876,12 +875,12 @@ void FormOperator::cluster_col2(vector<vector<Bbox>>& clusters_row, vector<vecto
 }
 
 //用IOU的思想对 列 进行聚类
-void FormOperator::cluster_col(vector<Bbox>& bboxs, vector<vector<Bbox>>& clusters_col)
+void FormOperator::cluster_col(std::vector<Bbox>& bboxs, std::vector<std::vector<Bbox>>& clusters_col)
 {
-    vector<Bbox> copy = bboxs;
+    std::vector<Bbox> copy = bboxs;
     sort(copy.begin(), copy.end(), compare_col);
-    vector<bool> flag(copy.size(), true);
-    vector<Bbox> tmp;
+    std::vector<bool> flag(copy.size(), true);
+    std::vector<Bbox> tmp;
     for (int i = 0; i < copy.size(); i++)
     {
         if (!flag[i]){
@@ -896,8 +895,8 @@ void FormOperator::cluster_col(vector<Bbox>& bboxs, vector<vector<Bbox>>& cluste
             if (!flag[j]){
                 continue;
             }
-            int Iou_min = max(tmp_left, copy[j].x);
-            int Iou_max = min(tmp_right, copy[j].x + copy[j].width);
+            int Iou_min = std::max(tmp_left, copy[j].x);
+            int Iou_max = std::min(tmp_right, copy[j].x + copy[j].width);
 
             /*cout << "compare: " << copy[i].x << " " << copy[i].text << " " << copy[j].x << " " << copy[j].text << endl;
             cout << tmp_left << " " << tmp_right << endl;
@@ -906,8 +905,8 @@ void FormOperator::cluster_col(vector<Bbox>& bboxs, vector<vector<Bbox>>& cluste
             if (Iou_max >= Iou_min && copy[j].class_idx == 100){
 //                cout << "lianjie: " << copy[j].text << endl;
                 tmp.push_back(copy[j]);
-                tmp_left = min(tmp_left, copy[j].x);
-                tmp_right = max(tmp_right, copy[j].x + copy[j].width);
+                tmp_left = std::min(tmp_left, copy[j].x);
+                tmp_right = std::max(tmp_right, copy[j].x + copy[j].width);
 
                 flag[j] = false;
             }
@@ -916,8 +915,8 @@ void FormOperator::cluster_col(vector<Bbox>& bboxs, vector<vector<Bbox>>& cluste
 
 //                cout << "lianjie2: " << copy[j].text << endl;
                 tmp.push_back(copy[j]);
-                tmp_left = min(tmp_left, copy[j].x);
-                tmp_right = max(tmp_right, copy[j].x + copy[j].width);
+                tmp_left = std::min(tmp_left, copy[j].x);
+                tmp_right = std::max(tmp_right, copy[j].x + copy[j].width);
 
                 flag[j] = false;
             }
@@ -944,11 +943,11 @@ void FormOperator::cluster_col(vector<Bbox>& bboxs, vector<vector<Bbox>>& cluste
 }
 
 //计算簇内的平方误差
-float FormOperator::getVar(vector<vector<Bbox>>& clusters, vector<Cluster_center>& centers, const int cur_k, bool row_or_col) {
+float FormOperator::getVar(std::vector<std::vector<Bbox>>& clusters, std::vector<Cluster_center>& centers, const int cur_k, bool row_or_col) {
     float var = 0;
     for (int i = 0; i < cur_k; i++)
     {
-        vector<Bbox> cluster = clusters[i];
+        std::vector<Bbox> cluster = clusters[i];
         for (int j = 0; j < cluster.size(); j++)
         {
             if (row_or_col) {
@@ -964,7 +963,7 @@ float FormOperator::getVar(vector<vector<Bbox>>& clusters, vector<Cluster_center
 }
 
 //根据算与聚类中心的距离，分配
-int FormOperator::cluster_of_tuple(vector<Cluster_center>& centers, Bbox bbox, const int cur_k, bool row_or_col) {
+int FormOperator::cluster_of_tuple(std::vector<Cluster_center>& centers, Bbox bbox, const int cur_k, bool row_or_col) {
     int dist = dist_row(centers[0], bbox);
     if (row_or_col) {
         dist = dist_col(centers[0], bbox);
@@ -985,7 +984,7 @@ int FormOperator::cluster_of_tuple(vector<Cluster_center>& centers, Bbox bbox, c
 }
 
 //计算簇的中心
-Cluster_center FormOperator::get_means(vector<Bbox>& clusters) {
+Cluster_center FormOperator::get_means(std::vector<Bbox>& clusters) {
     int num = clusters.size();
     float meansX= 0.0, meansY = 0.0;
     Cluster_center center;
@@ -999,8 +998,8 @@ Cluster_center FormOperator::get_means(vector<Bbox>& clusters) {
 }
 
 //单个K的k-means算法
-float FormOperator::k_means(vector<Bbox>& bboxs, const int cur_k, vector<vector<Bbox>>& clusters, vector<Cluster_center>& centers, bool row_or_col) {
-    //vector<vector<Bbox>> clusters(k);
+float FormOperator::k_means(std::vector<Bbox>& bboxs, const int cur_k, std::vector<std::vector<Bbox>>& clusters, std::vector<Cluster_center>& centers, bool row_or_col) {
+    //std::vector<std::vector<Bbox>> clusters(k);
     clusters.resize(cur_k);
     centers.resize(cur_k);
     int i = 0;
@@ -1015,12 +1014,12 @@ float FormOperator::k_means(vector<Bbox>& bboxs, const int cur_k, vector<vector<
     }
 
     for (label = 0; label < cur_k; label++) {
-        cout << "第" << label + 1 << "个簇" << endl;
-        vector<Bbox> box = clusters[label];
+        std::cout << "第" << label + 1 << "个簇" << std::endl;
+        std::vector<Bbox> box = clusters[label];
         for (i = 0; i < box.size(); i++) {
-            cout << box[i].x << " " << box[i].y << " " << box[i].text << endl;
+            std::cout << box[i].x << " " << box[i].y << " " << box[i].text << std::endl;
         }
-        cout << endl;
+        std::cout << std::endl;
     }
 
     float oldVal = -1;
@@ -1043,24 +1042,24 @@ float FormOperator::k_means(vector<Bbox>& bboxs, const int cur_k, vector<vector<
         }
 
         for (label = 0; label < cur_k; label++) {
-            cout << "第" << label + 1 << "个簇" << endl;
-            vector<Bbox> box = clusters[label];
+            std::cout << "第" << label + 1 << "个簇" << std::endl;
+            std::vector<Bbox> box = clusters[label];
             for (i = 0; i < box.size(); i++) {
-                cout << box[i].x << " " << box[i].y << " " << box[i].text << endl;
+                std::cout << box[i].x << " " << box[i].y << " " << box[i].text << std::endl;
             }
-            cout << endl;
+            std::cout << std::endl;
         }
     }
     return newVal;
 }
 
 //找最优的K值
-int FormOperator::find_best_k(vector<Bbox>& bboxs, const int k_min, const int k_max, vector<vector<Bbox>>& clusters, vector<Cluster_center>& centers, bool row_or_col) {
+int FormOperator::find_best_k(std::vector<Bbox>& bboxs, const int k_min, const int k_max, std::vector<std::vector<Bbox>>& clusters, std::vector<Cluster_center>& centers, bool row_or_col) {
     int final_k = 0;
     int cur_k = k_min;
     float final_loss = 0.0;
-    vector<vector<Bbox>> tmp;
-    vector<Cluster_center> tmp_centers;
+    std::vector<std::vector<Bbox>> tmp;
+    std::vector<Cluster_center> tmp_centers;
     while (cur_k <= k_max) {
         if (cur_k == k_min) {
             final_loss = k_means(bboxs, cur_k, clusters, centers, row_or_col);
@@ -1068,7 +1067,7 @@ int FormOperator::find_best_k(vector<Bbox>& bboxs, const int k_min, const int k_
         }
         else {
             float loss = k_means(bboxs, cur_k, tmp, tmp_centers, row_or_col);
-            cout << "loss: " << loss << endl;
+            std::cout << "loss: " << loss << std::endl;
             if (loss < final_loss) {
                 final_k = cur_k;
                 //清空每个簇
@@ -1085,9 +1084,9 @@ int FormOperator::find_best_k(vector<Bbox>& bboxs, const int k_min, const int k_
 }
 
 //group聚类行的结果
-void FormOperator::group_row(vector<vector<Bbox>>& clusters, vector<Cluster_center>& centers) {
-    vector<int> cluster_bottoms(clusters.size());
-    vector<int> cluster_tops(clusters.size());
+void FormOperator::group_row(std::vector<std::vector<Bbox>>& clusters, std::vector<Cluster_center>& centers) {
+    std::vector<int> cluster_bottoms(clusters.size());
+    std::vector<int> cluster_tops(clusters.size());
     for (int i = 0; i < clusters.size(); i++) {
         int tmp_bottom = 0;
         int tmp_top = INT_MAX;
@@ -1106,16 +1105,16 @@ void FormOperator::group_row(vector<vector<Bbox>>& clusters, vector<Cluster_cent
 
     for (int i = 0; i < clusters.size(); i++) {
         for (int j = i + 1; j < clusters.size(); j++) {
-            int Iou_min = max(cluster_tops[i], cluster_tops[j]);
-            int Iou_max = min(cluster_bottoms[i], cluster_bottoms[j]);
+            int Iou_min = std::max(cluster_tops[i], cluster_tops[j]);
+            int Iou_max = std::min(cluster_bottoms[i], cluster_bottoms[j]);
             if (Iou_max >= Iou_min) {
                 clusters[i].insert(clusters[i].end(), clusters[j].begin(), clusters[j].end());
                 float new_center_x = (centers[i].x + centers[j].x) / 2;
                 float new_center_y = (centers[i].y + centers[j].y) / 2;
                 centers[i].x = new_center_x;
                 centers[i].y = new_center_y;
-                cluster_bottoms[i] = max(cluster_bottoms[i], cluster_bottoms[j]);
-                cluster_tops[i] = min(cluster_tops[i], cluster_tops[j]);
+                cluster_bottoms[i] = std::max(cluster_bottoms[i], cluster_bottoms[j]);
+                cluster_tops[i] = std::min(cluster_tops[i], cluster_tops[j]);
 
                 clusters.erase(clusters.begin() + j);
                 centers.erase(centers.begin() + j);
@@ -1130,10 +1129,10 @@ void FormOperator::group_row(vector<vector<Bbox>>& clusters, vector<Cluster_cent
 }
 
 //group聚类列的结果
-void FormOperator::group_col(vector<vector<Bbox>>& clusters, vector<Cluster_center>& centers)
+void FormOperator::group_col(std::vector<std::vector<Bbox>>& clusters, std::vector<Cluster_center>& centers)
 {
-    vector<int> cluster_rights(clusters.size());
-    vector<int> cluster_lefts(clusters.size());
+    std::vector<int> cluster_rights(clusters.size());
+    std::vector<int> cluster_lefts(clusters.size());
     for (int i = 0; i < clusters.size(); i++) {
         int tmp_right = 0;
         int tmp_left = INT_MAX;
@@ -1150,16 +1149,16 @@ void FormOperator::group_col(vector<vector<Bbox>>& clusters, vector<Cluster_cent
     }
     for (int i = 0; i < clusters.size(); i++) {
         for (int j = i + 1; j < clusters.size(); j++) {
-            int Iou_min = max(cluster_lefts[i], cluster_lefts[j]);
-            int Iou_max = min(cluster_rights[i], cluster_rights[j]);
+            int Iou_min = std::max(cluster_lefts[i], cluster_lefts[j]);
+            int Iou_max = std::min(cluster_rights[i], cluster_rights[j]);
             if (Iou_max >= Iou_min) {
                 clusters[i].insert(clusters[i].end(), clusters[j].begin(), clusters[j].end());
                 float new_center_x = (centers[i].x + centers[j].x) / 2;
                 float new_center_y = (centers[i].y + centers[j].y) / 2;
                 centers[i].x = new_center_x;
                 centers[i].y = new_center_y;
-                cluster_rights[i] = max(cluster_rights[i], cluster_rights[j]);
-                cluster_lefts[i] = min(cluster_lefts[i], cluster_lefts[j]);
+                cluster_rights[i] = std::max(cluster_rights[i], cluster_rights[j]);
+                cluster_lefts[i] = std::min(cluster_lefts[i], cluster_lefts[j]);
 
                 clusters.erase(clusters.begin() + j);
                 centers.erase(centers.begin() + j);
@@ -1193,20 +1192,20 @@ bool FormOperator::compare_col(const Bbox a, const Bbox b){
 }
 
 //行结果的排序规则
-bool FormOperator::comp_row(const vector<Bbox>& a, const vector<Bbox>& b) {
+bool FormOperator::comp_row(const std::vector<Bbox>& a, const std::vector<Bbox>& b) {
     return a[0].y < b[0].y;
 }
 
 //列结果的排序规则
-bool FormOperator::comp_col(const vector<Bbox>& a, const vector<Bbox>& b){
+bool FormOperator::comp_col(const std::vector<Bbox>& a, const std::vector<Bbox>& b){
     return a[0].x < b[0].x;
 }
 
 //对一个格子里面的box按从左到右排序
 bool FormOperator::comp_col_single(const Bbox a, const Bbox b) {
 //    if a.y < b.y
-    int iou_min = max(a.y, b.y);
-    int iou_max = min(a.y + a.height, b.y + b.height);
+    int iou_min = std::max(a.y, b.y);
+    int iou_max = std::min(a.y + a.height, b.y + b.height);
     if (iou_max > iou_min){
         return a.x < b.x;
     }
@@ -1229,13 +1228,13 @@ bool FormOperator::comp_row_single(const Bbox a, const Bbox b) {
 }
 
 //将拆分下来的字符串，按照内容，封装到一个bounding box结构体对象里面
-void FormOperator::analysis(vector<string>& file_content, vector<Bbox>& bboxs, vector<Big_bbox>& big_bboxs) {
+void FormOperator::analysis(std::vector<std::string>& file_content, std::vector<Bbox>& bboxs, std::vector<Big_bbox>& big_bboxs) {
     for (int i = 0; i < file_content.size(); i++) {
         Bbox bbox;
         Big_bbox big_bbox;
-        vector<string> splitedLine = split_line(file_content[i], ' ');
+        std::vector<std::string> splitedLine = split_line(file_content[i], ' ');
         if (splitedLine.size() >= 5){
-            string class_id = split_line(splitedLine[4], ':')[1];
+            std::string class_id = split_line(splitedLine[4], ':')[1];
             if (class_id == "203" || class_id == "200" || class_id == "201" || class_id == "202") {
                 big_bbox.x = stoi(split_line(splitedLine[0], ':')[1]);
                 big_bbox.y = stoi(split_line(splitedLine[1], ':')[1]);
@@ -1264,14 +1263,14 @@ void FormOperator::analysis(vector<string>& file_content, vector<Bbox>& bboxs, v
 }
 
 //过滤掉大框外面的小框
-void FormOperator::filter(vector<Bbox>& bboxs, Big_bbox big_bbox){
-    vector<Bbox> tmp;
+void FormOperator::filter(std::vector<Bbox>& bboxs, Big_bbox big_bbox){
+    std::vector<Bbox> tmp;
     for (int i = 0; i < bboxs.size(); i++){
-        int Iou_min_row = max(bboxs[i].x, big_bbox.x);
-        int Iou_max_row = min(bboxs[i].x + bboxs[i].width, big_bbox.x + big_bbox.width);
+        int Iou_min_row = std::max(bboxs[i].x, big_bbox.x);
+        int Iou_max_row = std::min(bboxs[i].x + bboxs[i].width, big_bbox.x + big_bbox.width);
 
-        int Iou_min_col = max(bboxs[i].y, big_bbox.y);
-        int Iou_max_col = min(bboxs[i].y + bboxs[i].height, big_bbox.y + big_bbox.height);
+        int Iou_min_col = std::max(bboxs[i].y, big_bbox.y);
+        int Iou_max_col = std::min(bboxs[i].y + bboxs[i].height, big_bbox.y + big_bbox.height);
 
 //        if (Iou_max_row >= Iou_min_row && Iou_max_col >= Iou_min_col){
         //增加过滤条件
@@ -1284,12 +1283,12 @@ void FormOperator::filter(vector<Bbox>& bboxs, Big_bbox big_bbox){
 }
 
 //实现字符串的split函数
-vector<string> FormOperator::split_line(string single_line, char symbol) {
+std::vector<std::string> FormOperator::split_line(std::string single_line, char symbol) {
     int pos = 0;
     int npos = 0;
-    vector<string> result;
+    std::vector<std::string> result;
     while ((npos = single_line.find(symbol, pos)) != -1) {
-        string tmp = single_line.substr(pos, npos - pos);
+        std::string tmp = single_line.substr(pos, npos - pos);
         result.push_back(tmp);
         pos = npos + 1;
     }
@@ -1298,15 +1297,15 @@ vector<string> FormOperator::split_line(string single_line, char symbol) {
 }
 
 //从识别结果的TXT中读取数据到内存
-void FormOperator::ReadDataFromTxt(string filename) {
-    ifstream in(filename);
-    string line;
+void FormOperator::ReadDataFromTxt(std::string filename) {
+    std::ifstream in(filename);
+    std::string line;
     if (in.is_open()) {
         while(getline(in, line)) {
             file_content.push_back(line);
         }
     }
     else {
-        cout << "no such file! " << endl;
+        std::cout << "no such file! " << std::endl;
     }
 }
