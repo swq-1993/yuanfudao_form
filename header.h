@@ -12,8 +12,6 @@
 #include <fstream>
 #include <algorithm>
 #include <math.h>
-#include <cmath>
-#include <unordered_map>
 #include <map>
 //using namespace std;
 #define k 9
