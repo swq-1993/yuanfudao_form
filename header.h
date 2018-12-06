@@ -22,6 +22,14 @@
 #define k_col_min 3
 #define k_col_max 15
 
+// 最后要的结果
+struct Res{
+    int x;
+    int y;
+    int width;
+    int height;
+    std::vector<std::string> splice_result;
+};
 
 // 单个检测框
 struct Bbox{
@@ -76,8 +84,13 @@ public:
     std::vector<Cluster_center> centers_row;
     std::vector<Cluster_center> centers_col;
 
-    std::vector<std::vector<std::string>> nums_result;
+    std::vector<std::vector<std::vector<std::string>>> nums_result;
     std::vector<Bbox> result_boxs;
+
+    //最后要的拼接的字符串数组，包括表格数字后面的单位
+    std::vector<std::vector<std::string>> splice_res;
+
+    std::vector<Res> final_res;
 
 
     std::vector<std::vector<std::vector<Bbox>>> group_res;
@@ -274,7 +287,7 @@ public:
     void group_col(std::vector<std::vector<Bbox>>& clusters, std::vector<Cluster_center>& centers);
 
     //按照上和左的位置进行排序
-    static bool compare(const Bbox a, const Bbox b);
+    static bool compare(const Bbox &a, const Bbox &b);
 
     static bool compare_col(const Bbox a, const Bbox b);
 

@@ -5,20 +5,46 @@
 
 //将解析的四则运算
 void FormOperator::transform_result(){
-    std::vector<char> law{'+', '-', '*', '/'};
+    std::vector<std::string> law{"+", "-", "*", "/"};
     if (formula > 3 || formula < 0){
+        result_boxs.clear();
+        std::cout << "算式不是正常四则运算" << std::endl;
         return;
     }
     if (nums_result.size() != result_boxs.size()){
         std::cout << "算式中有未识别完整的式子" << std::endl;
+        result_boxs.clear();
         return;
     }
-    std::string tmp = "";
+
+    std::vector<std::string> tmp;
+    tmp.clear();
     for (int i = 0; i < nums_result.size(); i++){
-        tmp = nums_result[i][0] + law[formula] + nums_result[i][1] + '=' + nums_result[i][2];
-        result_boxs[i].text = tmp;
-        tmp = "";
+        for (int j = 0; j < nums_result[i].size(); j++){
+            if (j == 1){
+                tmp.push_back(law[formula]);
+            }
+            else if (j == 2){
+                tmp.push_back("=");
+            }
+            for (int m = 0; m < nums_result[i][j].size(); m++){
+                tmp.push_back(nums_result[i][j][m]);
+            }
+        }
+        splice_res.push_back(tmp);
+        tmp.clear();
     }
+
+    Res tmp_res;
+    for (int i = 0; i < result_boxs.size(); i++){
+        tmp_res.x = result_boxs[i].x;
+        tmp_res.y = result_boxs[i].y;
+        tmp_res.width = result_boxs[i].width;
+        tmp_res.height = result_boxs[i].height;
+        tmp_res.splice_result = splice_res[i];
+        final_res.push_back(tmp_res);
+    }
+
 }
 
 //调用整个识别运算规则
@@ -76,7 +102,7 @@ void FormOperator::get_normal_res(std::vector<std::vector<std::vector<Bbox>>>& g
                 if (!group_res[rows[i]][col].empty() &&
                         (group_res[rows[i]][col][0].class_idx == 104 || group_res[rows[i]][col][0].class_idx == 101)){
                     if (group_res[rows[i]][col][0].text.empty()){
-                        tmp.push_back("空");
+                        tmp.push_back("$BNK$");
                     }
                     else {
                         tmp.push_back(group_res[rows[i]][col][0].text);
@@ -99,7 +125,7 @@ void FormOperator::get_normal_res(std::vector<std::vector<std::vector<Bbox>>>& g
                 if (!group_res[row][cols[i]].empty() &&
                         (group_res[row][cols[i]][0].class_idx == 104 || group_res[row][cols[i]][0].class_idx == 101)){
                     if (group_res[row][cols[i]][0].text.empty()){
-                        tmp.push_back("空");
+                        tmp.push_back("$BNK$");
                     }
                     else {
                         tmp.push_back(group_res[row][cols[i]][0].text);
@@ -328,7 +354,7 @@ std::vector<std::vector<int>> FormOperator::exist_long_chi(std::vector<std::vect
         return coord;
     }
     for (int i = 0; i < group_res[0].size(); i++){
-        if (!group_res[0].empty()){
+        //if (!group_res[0].empty()){
             for (int j = 0; j < group_res[0][i].size(); j++){
                 if (group_res[0][i][j].text.length() > chi_length && group_res[0][i][j].class_idx == 100)
                 {
@@ -340,7 +366,7 @@ std::vector<std::vector<int>> FormOperator::exist_long_chi(std::vector<std::vect
                     tmp.clear();
                 }
             }
-        }
+        //}
 
     }
 
@@ -482,54 +508,70 @@ int FormOperator::match_formula(std::map< std::pair<std::pair <std::string,std::
         res = 4;
         nums_size = 4;
         std::vector<std::string> tmp;
+        std::vector<std::vector<std::string>> tmp_2d;
         find = true;
+        int tmp_size = 0;
         if (row_index.size() == 4){
             int cur_col = col_index[0];
             for (int i = cur_col + 1; i < group_res[0].size(); i++){
-                tmp.clear();
+                tmp_size = 0;
                 for (int j = 0; j < nums_size; j++){
                     if (!group_res[row_index[j]][i].empty() &&
                             (group_res[row_index[j]][i][0].class_idx == 104 || group_res[row_index[j]][i][0].class_idx == 101)){
                         if (group_res[row_index[j]][i][0].text.empty()){
-                            tmp.push_back("空");
+                            tmp.push_back("$BNK$");
                         }
                         else {
-                            tmp.push_back(group_res[row_index[j]][i][0].text);
+                            for (int index = 0; index < group_res[row_index[j]][i].size(); index++){
+                                tmp.push_back(group_res[row_index[j]][i][index].text);
+                            }
                         }
+                        tmp_2d.push_back(tmp);
+                        tmp_size++;
+                        tmp.clear();
                     }
                     else {
                         break;
                     }
+
                 }
-                if (tmp.size() == nums_size){
-                    nums_result.push_back(tmp);
+                if (tmp_size == nums_size){
+                    nums_result.push_back(tmp_2d);
+                    tmp_2d.clear();
                 }
             }
         }
         else {
             for (int i = row + 1; i < group_res.size(); i++){
-                tmp.clear();
-                for (int j = 0; j < nums.size(); j++){
+                tmp_size = 0;
+                for (int j = 0; j < nums_size; j++){
                     if (!group_res[i][col_index[j]].empty() &&
                             (group_res[i][col_index[j]][0].class_idx == 104 || group_res[i][col_index[j]][0].class_idx == 101)){
+
                         if (group_res[i][col_index[j]][0].text.empty()){
-                            tmp.push_back("空");
+                            tmp.push_back("$BNK$");
                         }
                         else {
-                            tmp.push_back(group_res[i][col_index[j]][0].text);
+                            for (int index = 0; index < group_res[i][col_index[j]].size(); index++){
+                                tmp.push_back(group_res[i][col_index[j]][index].text);
+                            }
                         }
+                        tmp_2d.push_back(tmp);
+                        tmp_size++;
+                        tmp.clear();
                     }
                     else{
                         break;
                     }
                 }
-                if (tmp.size() == nums_size){
-                    nums_result.push_back(tmp);
+                if (tmp_size == nums_size){
+                    nums_result.push_back(tmp_2d);
                 }
             }
         }
     }
     else {
+        int tmp_size = 0;
         std::map< std::pair<std::pair <std::string,std::string>, std::string>, int > :: iterator iter;
         std::vector<int> rows;
         std::vector<int> cols;
@@ -571,26 +613,33 @@ int FormOperator::match_formula(std::map< std::pair<std::pair <std::string,std::
                             }
                             if (rows.size() == nums_size) {
                                 std::vector<std::string> tmp;
+                                std::vector<std::vector<std::string>> tmp_2d;
                                 for (int i = col + 1; i < group_res[0].size(); i++) {
-                                    tmp.clear();
+                                    tmp_size = 0;
                                     for (int j = 0; j < nums_size; j++) {
                                         if (!group_res[rows[j]][i].empty() &&
                                             (group_res[rows[j]][i][0].class_idx == 104 || group_res[rows[j]][i][0].class_idx == 101)) {
 //                            cout << "题目坐标： "<< rows[j] << " " << i << endl;
+
                                             if (group_res[rows[j]][i][0].class_idx == 101){
                                                 result_boxs.push_back(group_res[rows[j]][i][0]);
                                             }
                                             if (group_res[rows[j]][i][0].text.empty()) {
                                                 tmp.push_back("$BNK$");
                                             } else {
-                                                tmp.push_back(group_res[rows[j]][i][0].text);
+                                                for (int index = 0; index < group_res[rows[j]][i].size(); index++)
+                                                tmp.push_back(group_res[rows[j]][i][index].text);
                                             }
+                                            tmp_2d.push_back(tmp);
+                                            tmp_size++;
+                                            tmp.clear();
                                         } else {
                                             break;
                                         }
                                     }
-                                    if (tmp.size() == nums_size) {
-                                        nums_result.push_back(tmp);
+                                    if (tmp_size == nums_size) {
+                                        nums_result.push_back(tmp_2d);
+                                        tmp_2d.clear();
                                     }
                                 }
                             }
@@ -618,11 +667,13 @@ int FormOperator::match_formula(std::map< std::pair<std::pair <std::string,std::
                             if (cols.size() == nums_size){
 
                                 std::vector<std::string> tmp;
+                                std::vector<std::vector<std::string>> tmp_2d;
                                 for (int i = row + 1; i < group_res.size(); i++){
-                                    tmp.clear();
+                                    tmp_size = 0;
                                     for (int j = 0; j < nums_size; j++){
                                         if (!group_res[i][cols[j]].empty() && (group_res[i][cols[j]][0].class_idx == 104 || group_res[i][cols[j]][0].class_idx == 101)){
 //                            cout << "题目坐标： "<< i << " " << cols[j] << endl;
+
                                             if (group_res[i][cols[j]][0].class_idx == 101){
                                                 result_boxs.push_back(group_res[i][cols[j]][0]);
                                             }
@@ -630,15 +681,21 @@ int FormOperator::match_formula(std::map< std::pair<std::pair <std::string,std::
                                                 tmp.push_back("$BNK$");
                                             }
                                             else{
-                                                tmp.push_back(group_res[i][cols[j]][0].text);
+                                                for (int index = 0; index < group_res[i][cols[j]].size(); index++) {
+                                                    tmp.push_back(group_res[i][cols[j]][index].text);
+                                                }
                                             }
+                                            tmp_2d.push_back(tmp);
+                                            tmp_size++;
+                                            tmp.clear();
                                         }
                                         else{
                                             break;
                                         }
                                     }
-                                    if (tmp.size() == nums_size){
-                                        nums_result.push_back(tmp);
+                                    if (tmp_size == nums_size){
+                                        nums_result.push_back(tmp_2d);
+                                        tmp_2d.clear();
                                     }
                                 }
                             }
@@ -669,7 +726,7 @@ int FormOperator::match_formula(std::map< std::pair<std::pair <std::string,std::
 
     if (!find){
         int find_normal = match_normal_formula(group_res, row_index, col_index);
-        std::cout << "find : " << find_normal << std::endl;
+//        std::cout << "find : " << find_normal << std::endl;
         if (find_normal != -1){
             get_normal_res(group_res, nums, row_index, col_index);
             res = rule.size() + stoi(normal_stem[find_normal].back());
@@ -1173,7 +1230,7 @@ void FormOperator::group_col(std::vector<std::vector<Bbox>>& clusters, std::vect
 }
 
 //按照上和左的位置进行排序
-bool FormOperator::compare(const Bbox a, const Bbox b) {
+bool FormOperator::compare(const Bbox &a, const Bbox &b) {
     if (a.y < b.y)
         return true;
     else if (a.y == b.y)

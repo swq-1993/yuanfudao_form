@@ -255,8 +255,16 @@ int main(int argc, char ** argv) {
 //        }
 //
     formOperator.run_result();
-    for (int i = 0; i < formOperator.result_boxs.size(); i++){
-        std::cout << formOperator.result_boxs[i].text << std::endl;
+//    for (int i = 0; i < formOperator.result_boxs.size(); i++){
+//        std::cout << formOperator.result_boxs[i].text << std::endl;
+//    }
+//    std::cout << std::endl;
+
+    for (int i = 0; i < formOperator.final_res.size(); i++){
+        for (int j = 0; j < formOperator.final_res[i].splice_result.size(); j++){
+            std::cout << formOperator.final_res[i].splice_result[j] << " ";
+        }
+        std::cout << std::endl;
     }
     std::cout << std::endl;
 
