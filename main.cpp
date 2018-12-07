@@ -5,26 +5,27 @@ int main(int argc, char ** argv) {
 
 //    string box_info_name = argv[1];
 
-    std::string box_info_clearname = "166ed457492cdbb.txt";
+    std::string box_info_clearname = "166d369b70a38f4.txt";
 
     FormOperator formOperator;
-    std::string file_path = "./box_info_sizeyunsuan/" + box_info_clearname;
-//    cout << box_info_clearname << endl;
+    std::string file_path = "./box_info_normal/" + box_info_clearname;
+//    std::cout << box_info_clearname << std::endl;
     formOperator.ReadDataFromTxt(file_path);
-//    formOperator.ReadDataFromTxt("../test.txt");
 
     if (formOperator.file_content.empty()){
         std::cout << "未从识别文档中解析出结果；" << std::endl;
         exit(1);
     }
+
     formOperator.analysis(formOperator.file_content, formOperator.bboxs, formOperator.big_bboxs);
-//    cout << formOperator.bboxs.size() << endl;
-    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[1]);
-//    cout << "after filter: " << formOperator.bboxs.size() << endl;
+//    std::cout << formOperator.bboxs.size() << std::endl;
+//    std::cout << formOperator.big_bboxs.size() << std::endl;
+    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[0]);
+//    std::cout << "after filter: " << formOperator.bboxs.size() << std::endl;
 //    for (int i = 0; i < formOperator.bboxs.size(); ++i) {
-//        cout << formOperator.bboxs[i].text << " ";
+//        std::cout << formOperator.bboxs[i].text << " ";
 //    }
-    std::cout << std::endl;
+//    std::cout << std::endl;
     clock_t start, end;
     start = clock();
 

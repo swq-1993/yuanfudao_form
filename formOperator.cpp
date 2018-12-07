@@ -2,6 +2,62 @@
 // Created by sunwanqi on 2018/11/9.
 //
 #include "header.h"
+using std::vector;
+using std::endl;
+using std::cout;
+using std::string;
+
+void FormOperator::transform_normal_result() {
+    vector<string> tmp;
+    tmp.clear();
+    for (int i = 0; i < nums_result.size(); i++){
+        for (int j = 0; j < nums_result[i].size(); j++){
+            if (j != 0 && j != nums_result[i].size() - 1){
+                tmp.push_back("+");
+            }
+            else if (j == nums_result[i].size() - 1){
+                tmp.push_back("=");
+            }
+            for (int m = 0; m < nums_result[i][j].size(); m++){
+                tmp.push_back(nums_result[i][j][m]);
+            }
+        }
+        splice_res.push_back(tmp);
+        tmp.clear();
+    }
+
+    /*for (int i = 0; i < splice_res.size(); i++){
+        for (int j = 0; j < splice_res[i].size(); j++){
+            cout << splice_res[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;*/
+
+    Res tmp_res;
+    for (int i = 0; i < result_boxs.size(); i++){
+        tmp_res.x = result_boxs[i].x;
+        tmp_res.y = result_boxs[i].y;
+        tmp_res.width = result_boxs[i].width;
+        tmp_res.height = result_boxs[i].height;
+        tmp_res.splice_result = splice_res[i];
+        final_res.push_back(tmp_res);
+    }
+}
+
+bool FormOperator::is_legal_form() {
+    bool res = true;
+    if (group_res.empty()){
+        return false;
+    }
+    int cols = group_res[0].size();
+    for (int i = 1; i < group_res.size(); i++){
+        if (cols != group_res[i].size()){
+            return false;
+        }
+    }
+    return res;
+}
 
 //将解析的四则运算
 void FormOperator::transform_result(){
@@ -69,12 +125,47 @@ void FormOperator::run_result()
     }
 
     init(stem_map);
+
+    for (int i = 0; i < group_res.size(); i++)
+    {
+        std::cout << "第" << i + 1 << "行：" << std::endl;
+        for (int j = 0; j < group_res[i].size(); j++)
+        {
+
+            for (int m = 0; m < group_res[i][j].size(); m++)
+            {
+//                cout << formOperator.group_res[i][j][m].x << " " << formOperator.group_res[i][j][m].y << " " << formOperator.group_res[i][j][m].text << " ";
+                std::cout << group_res[i][j][m].text << " ";
+            }
+            std::cout << "|";
+        }
+        std::cout << std::endl;
+    }
+
+    if (!is_legal_form()){
+        std::cout << "非法表格" << std::endl;
+        return;
+    }
+
+
     formula = match_formula(stem_map, group_res);
     if (formula == -1){
         std::cout << "未知运算 " << std::endl;
     }
     else if (formula >= rule.size()){
         std::cout << normal_rule[formula - rule.size()] << std::endl;
+
+        for (int i = 0; i < nums_result.size(); i++){
+            for (int j = 0; j < nums_result[i].size(); j++){
+                for (int m =  0; m < nums_result[i][j].size(); m++){
+                    cout << nums_result[i][j][m] << " ";
+                }
+            }
+            cout << endl;
+        }
+        cout << endl;
+        transform_normal_result();
+
     }
     else {
         std::cout << rule[formula] << std::endl;
@@ -93,50 +184,83 @@ void FormOperator::run_result()
 //获取非四则运算匹配之后的结果
 void FormOperator::get_normal_res(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<std::vector<std::string>>& nums, std::vector<int>& rows, std::vector<int>& cols){
     std::vector<std::string> tmp;
+    vector<vector<string>> tmp_2d;
+    tmp.clear();
+    tmp_2d.clear();
 //    cout << "coordinate: " << rows.size() << " " << cols.size() << endl;
     if (cols.size() == 1){
         int cur_col = cols[0];
         for (int col = cur_col + 1; col < group_res[0].size(); col++){
-            tmp.clear();
+            int tmp_size = 0;
             for (int i = 0; i < rows.size(); i++){
                 if (!group_res[rows[i]][col].empty() &&
                         (group_res[rows[i]][col][0].class_idx == 104 || group_res[rows[i]][col][0].class_idx == 101)){
+                    if (group_res[rows[i]][col][0].class_idx == 101){
+                        result_boxs.push_back(group_res[rows[i]][col][0]);
+                    }
                     if (group_res[rows[i]][col][0].text.empty()){
                         tmp.push_back("$BNK$");
                     }
                     else {
-                        tmp.push_back(group_res[rows[i]][col][0].text);
+                        for (int index = 0; index < group_res[rows[i]][col].size(); index++) {
+                            tmp.push_back(group_res[rows[i]][col][index].text);
+                        }
                     }
+                    tmp_2d.push_back(tmp);
+                    tmp_size++;
+                    tmp.clear();
                 }
                 else {
-                    tmp.push_back(" ");
+                    break;
                 }
             }
-            nums.push_back(tmp);
-
+            if (tmp_size == rows.size()){
+                nums_result.push_back(tmp_2d);
+//                如果一个式子里面没有手写体框，就添加最后一个框为判别框
+                if (nums_result.size() == result_boxs.size() + 1){
+                    result_boxs.push_back(group_res[rows.back()][col][0]);
+                }
+                tmp_2d.clear();
+            }
         }
     }
     else if (rows.size() == 1){
         int cur_row = rows[0];
         for (int row = cur_row + 1; row < group_res.size(); row++){
-            tmp.clear();
-
+            int tmp_size = 0;
             for (int i = 0; i < cols.size(); i++){
                 if (!group_res[row][cols[i]].empty() &&
                         (group_res[row][cols[i]][0].class_idx == 104 || group_res[row][cols[i]][0].class_idx == 101)){
+                    if (group_res[row][cols[i]][0].class_idx == 101){
+                        result_boxs.push_back(group_res[row][cols[i]][0]);
+                    }
                     if (group_res[row][cols[i]][0].text.empty()){
                         tmp.push_back("$BNK$");
                     }
                     else {
-                        tmp.push_back(group_res[row][cols[i]][0].text);
+                        for (int index = 0; index < group_res[row][cols[i]].size(); index++){
+                            tmp.push_back(group_res[row][cols[i]][index].text);
+                        }
                     }
+                    tmp_2d.push_back(tmp);
+                    tmp_size++;
+                    tmp.clear();
                 }
                 else {
-                    tmp.push_back(" ");
+                    break;
                 }
 
             }
-            nums.push_back(tmp);
+            if (tmp_size == cols.size()){
+                nums_result.push_back(tmp_2d);
+//                如果一个式子里面没有手写体框，就添加最后一个框为判别框
+                if (nums_result.size() == result_boxs.size() + 1){
+                    result_boxs.push_back(group_res[row][cols.back()][0]);
+                }
+                tmp_2d.clear();
+
+            }
+
         }
     }
 
@@ -215,7 +339,7 @@ int FormOperator::match_normal_formula(std::vector<std::vector<std::vector<Bbox>
                         }
                         //刚刚匹配到
                         if (cols.size() == normal_stem[start].size() - 1){
-                            std::cout << "pipei dao" << std::endl;
+                            std::cout << "matched normal computation" << std::endl;
                             find_col = true;
                             rows.push_back(row);
 //                            break;
@@ -227,7 +351,6 @@ int FormOperator::match_normal_formula(std::vector<std::vector<std::vector<Bbox>
                     }
 
                 }
-
                 start++;
             }
         }
@@ -472,6 +595,9 @@ bool FormOperator::part_match(std::string a, std::string b){
 
 //添加前缀匹配规则
 bool FormOperator::string_blurry_match(std::string a, std::string b){
+    if (a == "" || b == ""){
+        return false;
+    }
     if (a.length() == b.length()){
         return a == b;
     }
@@ -500,6 +626,7 @@ int FormOperator::match_formula(std::map< std::pair<std::pair <std::string,std::
     bool find = false;
     int row = -1;
     int col = -1;
+
     std::vector<int> row_index;
     std::vector<int> col_index;
     std::vector<std::vector<std::string>> nums;
@@ -633,12 +760,17 @@ int FormOperator::match_formula(std::map< std::pair<std::pair <std::string,std::
                                             tmp_2d.push_back(tmp);
                                             tmp_size++;
                                             tmp.clear();
+
                                         } else {
                                             break;
                                         }
                                     }
                                     if (tmp_size == nums_size) {
                                         nums_result.push_back(tmp_2d);
+//                                        如果一个式子里面没有手写体框，就添加最后一个框为判别框
+                                        if (nums_result.size() == result_boxs.size() + 1){
+                                            result_boxs.push_back(group_res[rows[nums_size - 1]][i][0]);
+                                        }
                                         tmp_2d.clear();
                                     }
                                 }
@@ -695,6 +827,10 @@ int FormOperator::match_formula(std::map< std::pair<std::pair <std::string,std::
                                     }
                                     if (tmp_size == nums_size){
                                         nums_result.push_back(tmp_2d);
+//                                        如果一个式子里面没有手写体框，就添加最后一个框为判别框
+                                        if (nums_result.size() == result_boxs.size() + 1){
+                                            result_boxs.push_back(group_res[i][cols[nums_size - 1]][0]);
+                                        }
                                         tmp_2d.clear();
                                     }
                                 }
@@ -710,12 +846,9 @@ int FormOperator::match_formula(std::map< std::pair<std::pair <std::string,std::
                     cols.clear();
                     iter++;
                 }
-
-
                 if (find){
                     break;
                 }
-
             }
             if (find){
                 break;
@@ -1292,7 +1425,7 @@ void FormOperator::analysis(std::vector<std::string>& file_content, std::vector<
         std::vector<std::string> splitedLine = split_line(file_content[i], ' ');
         if (splitedLine.size() >= 5){
             std::string class_id = split_line(splitedLine[4], ':')[1];
-            if (class_id == "203" || class_id == "200" || class_id == "201" || class_id == "202") {
+            if (class_id == "203" || class_id == "200" || class_id == "201" || class_id == "202" || class_id == "204") {
                 big_bbox.x = stoi(split_line(splitedLine[0], ':')[1]);
                 big_bbox.y = stoi(split_line(splitedLine[1], ':')[1]);
                 big_bbox.width = stoi(split_line(splitedLine[2], ':')[1]);

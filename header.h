@@ -87,6 +87,9 @@ public:
     std::vector<std::vector<std::vector<std::string>>> nums_result;
     std::vector<Bbox> result_boxs;
 
+    //判断每一行的列是否一样，不一样的话就是非法框，不用匹配运算，直接过滤掉
+    bool is_legal_form();
+
     //最后要的拼接的字符串数组，包括表格数字后面的单位
     std::vector<std::vector<std::string>> splice_res;
 
@@ -159,7 +162,7 @@ public:
     //更加一般情况的运算法则
     std::vector<std::string> normal_rule{"连加法", "连减法", "长方体体积", "长方形周长", "正方形周长", "正方形面积",
                                 "长方形面积", "三角形面积", "平行四边形面积", "梯形面积", "除法", "圆周长面积",
-                                "正方体表面积体积", "圆柱体表面积体积"};
+                                "正方体表面积体积", "圆柱体表面积体积", "既加又减运算"};
 
     //更加一般的情况
     std::vector<std::vector<std::string>> normal_stem{
@@ -183,11 +186,15 @@ public:
             {"棱长", "表面积", "体积", "12"},
             {"做了", "做了", "一共", "0"},
             {"杨树", "柳树", "松树", "总计", "0"},
-            {"半径", "直径", "高", "表面积", "体积", "13"}
+            {"半径", "直径", "高", "表面积", "体积", "13"},
+            {"原来", "进", "出", "剩", "14"}
 
     };
 
     std::vector<std::string> key_word{"长方形", "正方形", "三角形"};
+
+    //将解析一般运算
+    void transform_normal_result();
 
     //将解析的四则运算
     void transform_result();
