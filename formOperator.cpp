@@ -7,33 +7,8 @@ using std::endl;
 using std::cout;
 using std::string;
 
-void FormOperator::transform_normal_result() {
-    vector<string> tmp;
-    tmp.clear();
-    for (int i = 0; i < nums_result.size(); i++){
-        for (int j = 0; j < nums_result[i].size(); j++){
-            if (j != 0 && j != nums_result[i].size() - 1){
-                tmp.push_back("+");
-            }
-            else if (j == nums_result[i].size() - 1){
-                tmp.push_back("=");
-            }
-            for (int m = 0; m < nums_result[i][j].size(); m++){
-                tmp.push_back(nums_result[i][j][m]);
-            }
-        }
-        splice_res.push_back(tmp);
-        tmp.clear();
-    }
-
-    /*for (int i = 0; i < splice_res.size(); i++){
-        for (int j = 0; j < splice_res[i].size(); j++){
-            cout << splice_res[i][j] << " ";
-        }
-        cout << endl;
-    }
-    cout << endl;*/
-
+//重新整理输出结构体
+void FormOperator::arrange_res() {
     Res tmp_res;
     for (int i = 0; i < result_boxs.size(); i++){
         tmp_res.x = result_boxs[i].x;
@@ -45,6 +20,148 @@ void FormOperator::transform_normal_result() {
     }
 }
 
+//将解析拼接非四则运算
+void FormOperator::transform_normal_result() {
+    vector<string> tmp;
+    tmp.clear();
+    int formula_normal = formula - rule.size();
+    for (int i = 0; i < nums_result.size(); i++){
+        //连加、连减、连乘(包括长方形面积)的case
+        if (formula_normal == 0 || formula_normal == 1 || formula_normal == 2 || formula_normal == 6){
+            for (int j = 0; j < nums_result[i].size(); j++){
+                if (j != 0 && j != nums_result[i].size() - 1){
+                    if (formula_normal == 0){
+                        tmp.push_back("+");
+                    }
+                    else if (formula_normal == 1){
+                        tmp.push_back("-");
+                    }
+                    else {
+                        tmp.push_back("*");
+                    }
+                }
+                else if (j == nums_result.size() - 1){
+                    tmp.push_back("=");
+                }
+                for (int m = 0; m < nums_result[i][j].size(); m++){
+                    tmp.push_back(nums_result[i][j][m]);
+                }
+            }
+        }
+        //长方形周长的case
+        else if (formula_normal == 3){
+            for (int j = 0; j < nums_result[i].size(); j++){
+                if (j == 0){
+                    tmp.push_back("2*(");
+                }
+                else if (j == 1){
+                    tmp.push_back("+");
+                }
+                else {
+                    tmp.push_back(")=");
+                }
+                for (int m = 0; m = nums_result[i][j].size(); m++){
+                    tmp.push_back(nums_result[i][j][m]);
+                }
+            }
+        }
+        //正方形周长
+        else if (formula_normal == 4){
+            for (int j = 0; j < nums_result[i].size(); j++){
+                if (j == 0){
+                    tmp.push_back("4*");
+                }
+                else {
+                    tmp.push_back("=");
+                }
+                for (int m = 0; m = nums_result[i][j].size(); m++){
+                    tmp.push_back(nums_result[i][j][m]);
+                }
+            }
+        }
+        //正方形面积
+        else if (formula_normal == 5){
+            for (int j = 0; j < nums_result[i].size(); j++){
+                if (j == 1){
+                    tmp.push_back("*");
+                }
+                else if (j == nums_result[i].size() - 1){
+                    tmp.push_back("=");
+                }
+                for (int m = 0; m = nums_result[i][j].size(); m++){
+                    tmp.push_back(nums_result[i][j][m]);
+                }
+            }
+        }
+        //三角形面积
+        else if (formula_normal == 7){
+            for (int j = 0; j < nums_result[i].size(); j++){
+                if (j == 0){
+                    tmp.push_back("0.5*");
+                }
+                else if (j == 1){
+                    tmp.push_back("*");
+                }
+                else {
+                    tmp.push_back("=");
+                }
+                for (int m = 0; m = nums_result[i][j].size(); m++){
+                    tmp.push_back(nums_result[i][j][m]);
+                }
+            }
+        }
+        //梯形面积
+        else if (formula_normal == 9){
+            for (int j = 0; j < nums_result[i].size(); j++){
+                if (j == 0){
+                    tmp.push_back("0.5*(");
+                }
+                else if (j == 1){
+                    tmp.push_back("+");
+                }
+                else if (j == 2){
+                    tmp.push_back(")*");
+                }
+                else {
+                    tmp.push_back("=");
+                }
+                for (int m = 0; m = nums_result[i][j].size(); m++){
+                    tmp.push_back(nums_result[i][j][m]);
+                }
+            }
+        }
+        //既加又减运算
+        else if (formula_normal == 14){
+            for (int j = 0; j < nums_result[i].size(); j++){
+                if (j == 1){
+                    tmp.push_back("+");
+                }
+                else if (j == 2){
+                    tmp.push_back("-");
+                }
+                else if (j == nums_result[i].size() - 1){
+                    tmp.push_back("=");
+                }
+                for (int m = 0; m < nums_result[i][j].size(); m++){
+                    tmp.push_back(nums_result[i][j][m]);
+                }
+            }
+        }
+
+        splice_res.push_back(tmp);
+        tmp.clear();
+    }
+    /*for (int i = 0; i < splice_res.size(); i++){
+        for (int j = 0; j < splice_res[i].size(); j++){
+            cout << splice_res[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;*/
+    arrange_res();
+}
+
+//判断每一行的列是否一样，不一样的话就是非法框，不用匹配运算，直接过滤掉
 bool FormOperator::is_legal_form() {
     bool res = true;
     if (group_res.empty()){
@@ -59,7 +176,7 @@ bool FormOperator::is_legal_form() {
     return res;
 }
 
-//将解析的四则运算
+//将解析拼接四则运算
 void FormOperator::transform_result(){
     std::vector<std::string> law{"+", "-", "*", "/"};
     if (formula > 3 || formula < 0){
@@ -91,16 +208,7 @@ void FormOperator::transform_result(){
         tmp.clear();
     }
 
-    Res tmp_res;
-    for (int i = 0; i < result_boxs.size(); i++){
-        tmp_res.x = result_boxs[i].x;
-        tmp_res.y = result_boxs[i].y;
-        tmp_res.width = result_boxs[i].width;
-        tmp_res.height = result_boxs[i].height;
-        tmp_res.splice_result = splice_res[i];
-        final_res.push_back(tmp_res);
-    }
-
+    arrange_res();
 }
 
 //调用整个识别运算规则
@@ -155,7 +263,7 @@ void FormOperator::run_result()
     else if (formula >= rule.size()){
         std::cout << normal_rule[formula - rule.size()] << std::endl;
 
-        for (int i = 0; i < nums_result.size(); i++){
+        /*for (int i = 0; i < nums_result.size(); i++){
             for (int j = 0; j < nums_result[i].size(); j++){
                 for (int m =  0; m < nums_result[i][j].size(); m++){
                     cout << nums_result[i][j][m] << " ";
@@ -163,20 +271,13 @@ void FormOperator::run_result()
             }
             cout << endl;
         }
-        cout << endl;
+        cout << endl;*/
         transform_normal_result();
-
     }
     else {
         std::cout << rule[formula] << std::endl;
-//        formula = -1;
         transform_result();
     }
-
-//    for (int i = 0; i < result_boxs.size(); i++){
-//        cout << result_boxs[i].text << endl;
-//    }
-//    cout << endl;
 }
 
 

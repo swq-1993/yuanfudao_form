@@ -87,9 +87,6 @@ public:
     std::vector<std::vector<std::vector<std::string>>> nums_result;
     std::vector<Bbox> result_boxs;
 
-    //判断每一行的列是否一样，不一样的话就是非法框，不用匹配运算，直接过滤掉
-    bool is_legal_form();
-
     //最后要的拼接的字符串数组，包括表格数字后面的单位
     std::vector<std::vector<std::string>> splice_res;
 
@@ -173,7 +170,7 @@ public:
             {"原有", "花去", "花去", "还剩", "1"},
             {"原有", "卖出", "卖出", "还剩", "1"},
 //            {"长", "宽", "高", "体积", "2"},
-            {"体积", "长", "宽", "高", "2"},
+            {"长", "宽", "高", "体积", "2"},
             {"长", "宽", "周长", "3"},
             {"边长", "周长", "4"},
             {"边长", "面积", "5"},
@@ -192,6 +189,12 @@ public:
     };
 
     std::vector<std::string> key_word{"长方形", "正方形", "三角形"};
+
+    //重新整理输出结构体
+    void arrange_res();
+
+    //判断每一行的列是否一样，不一样的话就是非法框，不用匹配运算，直接过滤掉
+    bool is_legal_form();
 
     //将解析一般运算
     void transform_normal_result();
