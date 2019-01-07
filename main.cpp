@@ -5,7 +5,7 @@ int main(int argc, char ** argv) {
 
 //    string box_info_name = argv[1];
 
-    std::string box_info_clearname = "166d369b70a38f4.txt";
+    std::string box_info_clearname = "1626706b6f5b740.txt";
 
     FormOperator formOperator;
     std::string file_path = "./box_info_normal/" + box_info_clearname;
@@ -20,7 +20,7 @@ int main(int argc, char ** argv) {
     formOperator.analysis(formOperator.file_content, formOperator.bboxs, formOperator.big_bboxs);
 //    std::cout << formOperator.bboxs.size() << std::endl;
 //    std::cout << formOperator.big_bboxs.size() << std::endl;
-    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[0]);
+    formOperator.filter(formOperator.bboxs, formOperator.big_bboxs[1]);
 //    std::cout << "after filter: " << formOperator.bboxs.size() << std::endl;
 //    for (int i = 0; i < formOperator.bboxs.size(); ++i) {
 //        std::cout << formOperator.bboxs[i].text << " ";
@@ -265,9 +265,16 @@ int main(int argc, char ** argv) {
         for (int j = 0; j < formOperator.final_res[i].splice_result.size(); j++){
             std::cout << formOperator.final_res[i].splice_result[j] << " ";
         }
-        std::cout << std::endl;
+        std::cout  << "$" << std::endl;
     }
-    std::cout << std::endl;
+    std::cout << "&" << std::endl;
+
+    /*for (int i = 0; i < formOperator.hand_write_index.size(); i++){
+        for (int j = 0; j < formOperator.hand_write_index[i].size(); j++){
+            std::cout << formOperator.hand_write_index[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }*/
 
     return 0;
 

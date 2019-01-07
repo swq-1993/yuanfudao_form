@@ -85,13 +85,15 @@ public:
     std::vector<Cluster_center> centers_col;
 
     std::vector<std::vector<std::vector<std::string>>> nums_result;
+
+    //手写体框的位置记录
+    std::vector<std::vector<bool>> hand_write_index;
     std::vector<Bbox> result_boxs;
 
     //最后要的拼接的字符串数组，包括表格数字后面的单位
     std::vector<std::vector<std::string>> splice_res;
 
     std::vector<Res> final_res;
-
 
     std::vector<std::vector<std::vector<Bbox>>> group_res;
 
@@ -189,6 +191,12 @@ public:
     };
 
     std::vector<std::string> key_word{"长方形", "正方形", "三角形"};
+
+    //单独处理正方形表面积体积问题
+    void process_square();
+
+    //单独处理圆直径周长面积题
+    void process_circle();
 
     //重新整理输出结构体
     void arrange_res();

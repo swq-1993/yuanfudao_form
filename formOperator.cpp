@@ -7,6 +7,157 @@ using std::endl;
 using std::cout;
 using std::string;
 
+//单独处理正方体表面积体积问题
+void FormOperator::process_square() {
+    int formula_normal = formula - rule.size();
+    vector<string> tmp;
+    for (int i = 0; i < nums_result.size(); i++){
+//      表面积是手写体
+        if (hand_write_index[i][1]){
+            tmp.push_back("6");
+            tmp.push_back("*");
+            tmp.push_back("(");
+            for (int m = 0; m < nums_result[i][0].size(); m++){
+                tmp.push_back(nums_result[i][0][m]);
+            }
+            tmp.push_back("*");
+            for (int m = 0; m < nums_result[i][0].size(); m++){
+                tmp.push_back(nums_result[i][0][m]);
+            }
+            tmp.push_back(")");
+            tmp.push_back("=");
+            for (int m = 0; m < nums_result[i][1].size(); m++){
+                tmp.push_back(nums_result[i][1][m]);
+            }
+            splice_res.push_back(tmp);
+            tmp.clear();
+        }
+        if (hand_write_index[i][2]){
+            for (int num = 0; num < 3; num++){
+                for (int m = 0; m < nums_result[i][0].size(); m++){
+                    tmp.push_back(nums_result[i][0][m]);
+                }
+                tmp.push_back("*");
+            }
+            tmp.pop_back();
+            tmp.push_back("=");
+            for (int m = 0; m < nums_result[i][2].size(); m++){
+                tmp.push_back(nums_result[i][2][m]);
+            }
+            splice_res.push_back(tmp);
+            tmp.clear();
+        }
+    }
+}
+
+//单独处理圆直径周长面积题
+void FormOperator::process_circle() {
+    int formula_normal = formula - rule.size();
+    vector<string> tmp;
+    for (int i = 0; i < nums_result.size(); i++) {
+        //半径是印刷体
+        if (!hand_write_index[i][0]) {
+            if (hand_write_index[i][1]) {
+                tmp.push_back("2");
+                tmp.push_back("*");
+                for (int m = 0; m < nums_result[i][0].size(); m++) {
+                    tmp.push_back(nums_result[i][0][m]);
+                }
+                tmp.push_back("=");
+                for (int m = 0; m < nums_result[i][1].size(); m++) {
+                    tmp.push_back(nums_result[i][1][m]);
+                }
+                splice_res.push_back(tmp);
+                tmp.clear();
+            }
+            if (hand_write_index[i][2]) {
+                tmp.push_back("2");
+                tmp.push_back("*");
+                tmp.push_back("pi");
+                tmp.push_back("*");
+                for (int m = 0; m < nums_result[i][0].size(); m++) {
+                    tmp.push_back(nums_result[i][0][m]);
+                }
+                tmp.push_back("=");
+                for (int m = 0; m < nums_result[i][2].size(); m++) {
+                    tmp.push_back(nums_result[i][2][m]);
+                }
+                splice_res.push_back(tmp);
+                tmp.clear();
+            }
+            if (hand_write_index[i][3]) {
+                tmp.push_back("pi");
+                tmp.push_back("*");
+                for (int m = 0; m < nums_result[i][0].size(); m++) {
+                    tmp.push_back(nums_result[i][0][m]);
+                }
+                tmp.push_back("*");
+                for (int m = 0; m < nums_result[i][0].size(); m++) {
+                    tmp.push_back(nums_result[i][0][m]);
+                }
+                tmp.push_back("=");
+                for (int m = 0; m < nums_result[i][3].size(); m++) {
+                    tmp.push_back(nums_result[i][3][m]);
+                }
+                splice_res.push_back(tmp);
+                tmp.clear();
+            }
+        }
+            //直径是印刷体
+        else if (!hand_write_index[i][1] && hand_write_index[i][0]) {
+            if (hand_write_index[i][0]) {
+                tmp.push_back("0.5");
+                tmp.push_back("*");
+                for (int m = 0; m < nums_result[i][1].size(); m++) {
+                    tmp.push_back(nums_result[i][1][m]);
+                }
+                tmp.push_back("=");
+                for (int m = 0; m < nums_result[i][0].size(); m++) {
+                    tmp.push_back(nums_result[i][0][m]);
+                }
+                splice_res.push_back(tmp);
+                tmp.clear();
+            }
+            if (hand_write_index[i][2]) {
+                tmp.push_back("pi");
+                tmp.push_back("*");
+                for (int m = 0; m < nums_result[i][1].size(); m++) {
+                    tmp.push_back(nums_result[i][1][m]);
+                }
+                tmp.push_back("=");
+                for (int m = 0; m < nums_result[i][2].size(); m++) {
+                    tmp.push_back(nums_result[i][2][m]);
+                }
+                splice_res.push_back(tmp);
+                tmp.clear();
+            }
+            if (hand_write_index[i][3]) {
+                tmp.push_back("0.25");
+                tmp.push_back("*");
+                tmp.push_back("pi");
+                tmp.push_back("*");
+                for (int m = 0; m < nums_result[i][1].size(); m++) {
+                    tmp.push_back(nums_result[i][1][m]);
+                }
+                tmp.push_back("*");
+                for (int m = 0; m < nums_result[i][1].size(); m++) {
+                    tmp.push_back(nums_result[i][1][m]);
+                }
+                tmp.push_back("=");
+                for (int m = 0; m < nums_result[i][3].size(); m++) {
+                    tmp.push_back(nums_result[i][3][m]);
+                }
+                splice_res.push_back(tmp);
+                tmp.clear();
+            }
+        } else {
+            cout << "给出的已知数值不是半径或者直径" << endl;
+        }
+        splice_res.push_back(tmp);
+        tmp.clear();
+    }
+}
+
 //重新整理输出结构体
 void FormOperator::arrange_res() {
     Res tmp_res;
@@ -16,7 +167,9 @@ void FormOperator::arrange_res() {
         tmp_res.width = result_boxs[i].width;
         tmp_res.height = result_boxs[i].height;
         tmp_res.splice_result = splice_res[i];
-        final_res.push_back(tmp_res);
+        if (!tmp_res.splice_result.empty()){
+            final_res.push_back(tmp_res);
+        }
     }
 }
 
@@ -40,7 +193,7 @@ void FormOperator::transform_normal_result() {
                         tmp.push_back("*");
                     }
                 }
-                else if (j == nums_result.size() - 1){
+                else if (j == nums_result[i].size() - 1){
                     tmp.push_back("=");
                 }
                 for (int m = 0; m < nums_result[i][j].size(); m++){
@@ -52,15 +205,18 @@ void FormOperator::transform_normal_result() {
         else if (formula_normal == 3){
             for (int j = 0; j < nums_result[i].size(); j++){
                 if (j == 0){
-                    tmp.push_back("2*(");
+                    tmp.push_back("2");
+                    tmp.push_back("*");
+                    tmp.push_back("(");
                 }
                 else if (j == 1){
                     tmp.push_back("+");
                 }
                 else {
-                    tmp.push_back(")=");
+                    tmp.push_back(")");
+                    tmp.push_back("=");
                 }
-                for (int m = 0; m = nums_result[i][j].size(); m++){
+                for (int m = 0; m < nums_result[i][j].size(); m++){
                     tmp.push_back(nums_result[i][j][m]);
                 }
             }
@@ -69,12 +225,13 @@ void FormOperator::transform_normal_result() {
         else if (formula_normal == 4){
             for (int j = 0; j < nums_result[i].size(); j++){
                 if (j == 0){
-                    tmp.push_back("4*");
+                    tmp.push_back("4");
+                    tmp.push_back("*");
                 }
                 else {
                     tmp.push_back("=");
                 }
-                for (int m = 0; m = nums_result[i][j].size(); m++){
+                for (int m = 0; m < nums_result[i][j].size(); m++){
                     tmp.push_back(nums_result[i][j][m]);
                 }
             }
@@ -88,7 +245,7 @@ void FormOperator::transform_normal_result() {
                 else if (j == nums_result[i].size() - 1){
                     tmp.push_back("=");
                 }
-                for (int m = 0; m = nums_result[i][j].size(); m++){
+                for (int m = 0; m < nums_result[i][j].size(); m++){
                     tmp.push_back(nums_result[i][j][m]);
                 }
             }
@@ -97,7 +254,8 @@ void FormOperator::transform_normal_result() {
         else if (formula_normal == 7){
             for (int j = 0; j < nums_result[i].size(); j++){
                 if (j == 0){
-                    tmp.push_back("0.5*");
+                    tmp.push_back("0.5");
+                    tmp.push_back("*");
                 }
                 else if (j == 1){
                     tmp.push_back("*");
@@ -105,7 +263,7 @@ void FormOperator::transform_normal_result() {
                 else {
                     tmp.push_back("=");
                 }
-                for (int m = 0; m = nums_result[i][j].size(); m++){
+                for (int m = 0; m < nums_result[i][j].size(); m++){
                     tmp.push_back(nums_result[i][j][m]);
                 }
             }
@@ -114,18 +272,21 @@ void FormOperator::transform_normal_result() {
         else if (formula_normal == 9){
             for (int j = 0; j < nums_result[i].size(); j++){
                 if (j == 0){
-                    tmp.push_back("0.5*(");
+                    tmp.push_back("0.5");
+                    tmp.push_back("*");
+                    tmp.push_back("(");
                 }
                 else if (j == 1){
                     tmp.push_back("+");
                 }
                 else if (j == 2){
-                    tmp.push_back(")*");
+                    tmp.push_back(")");
+                    tmp.push_back("*");
                 }
                 else {
                     tmp.push_back("=");
                 }
-                for (int m = 0; m = nums_result[i][j].size(); m++){
+                for (int m = 0; m < nums_result[i][j].size(); m++){
                     tmp.push_back(nums_result[i][j][m]);
                 }
             }
@@ -146,6 +307,20 @@ void FormOperator::transform_normal_result() {
                     tmp.push_back(nums_result[i][j][m]);
                 }
             }
+        }
+//      以下情况会出现多个手写体
+//      圆的直径、周长、面积
+        else if (formula_normal == 11){
+            process_circle();
+        }
+        //正方形表面积体积
+        else if (formula_normal == 12){
+            process_square();
+        }
+
+        //圆柱体表面积体积
+        else if (formula_normal == 13){
+            cout << "就一两个case，暂时没有处理" << endl;
         }
 
         splice_res.push_back(tmp);
@@ -280,14 +455,13 @@ void FormOperator::run_result()
     }
 }
 
-
-
 //获取非四则运算匹配之后的结果
 void FormOperator::get_normal_res(std::vector<std::vector<std::vector<Bbox>>>& group_res, std::vector<std::vector<std::string>>& nums, std::vector<int>& rows, std::vector<int>& cols){
     std::vector<std::string> tmp;
     vector<vector<string>> tmp_2d;
     tmp.clear();
     tmp_2d.clear();
+    vector<bool> tmp_hand_write;
 //    cout << "coordinate: " << rows.size() << " " << cols.size() << endl;
     if (cols.size() == 1){
         int cur_col = cols[0];
@@ -298,6 +472,10 @@ void FormOperator::get_normal_res(std::vector<std::vector<std::vector<Bbox>>>& g
                         (group_res[rows[i]][col][0].class_idx == 104 || group_res[rows[i]][col][0].class_idx == 101)){
                     if (group_res[rows[i]][col][0].class_idx == 101){
                         result_boxs.push_back(group_res[rows[i]][col][0]);
+                        tmp_hand_write.push_back(true);
+                    }
+                    else{
+                        tmp_hand_write.push_back(false);
                     }
                     if (group_res[rows[i]][col][0].text.empty()){
                         tmp.push_back("$BNK$");
@@ -320,8 +498,11 @@ void FormOperator::get_normal_res(std::vector<std::vector<std::vector<Bbox>>>& g
 //                如果一个式子里面没有手写体框，就添加最后一个框为判别框
                 if (nums_result.size() == result_boxs.size() + 1){
                     result_boxs.push_back(group_res[rows.back()][col][0]);
+                    tmp_hand_write.push_back(false);
                 }
                 tmp_2d.clear();
+                hand_write_index.push_back(tmp_hand_write);
+                tmp_hand_write.clear();
             }
         }
     }
@@ -334,6 +515,10 @@ void FormOperator::get_normal_res(std::vector<std::vector<std::vector<Bbox>>>& g
                         (group_res[row][cols[i]][0].class_idx == 104 || group_res[row][cols[i]][0].class_idx == 101)){
                     if (group_res[row][cols[i]][0].class_idx == 101){
                         result_boxs.push_back(group_res[row][cols[i]][0]);
+                        tmp_hand_write.push_back(true);
+                    }
+                    else{
+                        tmp_hand_write.push_back(false);
                     }
                     if (group_res[row][cols[i]][0].text.empty()){
                         tmp.push_back("$BNK$");
@@ -357,8 +542,11 @@ void FormOperator::get_normal_res(std::vector<std::vector<std::vector<Bbox>>>& g
 //                如果一个式子里面没有手写体框，就添加最后一个框为判别框
                 if (nums_result.size() == result_boxs.size() + 1){
                     result_boxs.push_back(group_res[row][cols.back()][0]);
+                    tmp_hand_write.push_back(false);
                 }
                 tmp_2d.clear();
+                hand_write_index.push_back(tmp_hand_write);
+                tmp_hand_write.clear();
 
             }
 
